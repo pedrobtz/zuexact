@@ -2,16 +2,23 @@
 
 ## Authors
 
-- **First Last**. Author, maintainer.
+- **Pedro Baltazar**. Author, maintainer, copyright holder.
+
+- **Radford M. Neal**. Copyright holder.  
+  Author of the vendored 'xsum' library
 
 ## Citation
 
-Last F (2026). *zuexact: What the Package Does (One Line, Title Case)*.
-R package version 0.0.0.9000, <https://pedrobtz.github.io/zuexact/>.
+Source:
+[`DESCRIPTION`](https://github.com/pedrobtz/zuexact/blob/main/DESCRIPTION)
+
+Baltazar P (2026). *zuexact: Exactly Rounded Sums, Means and Dot
+Products*. R package version 0.0.0.9000,
+<https://pedrobtz.github.io/zuexact/>.
 
     @Manual{,
-      title = {zuexact: What the Package Does (One Line, Title Case)},
-      author = {First Last},
+      title = {zuexact: Exactly Rounded Sums, Means and Dot Products},
+      author = {Pedro Baltazar},
       year = {2026},
       note = {R package version 0.0.0.9000},
       url = {https://pedrobtz.github.io/zuexact/},
