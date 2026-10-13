@@ -1,8 +1,6 @@
 # Stage 1: the vendored xsum, reached through the internal self-test entry
 # point. Both accumulators must give the correctly rounded sum.
 
-selftest <- function(x) .Call(zuexact:::zxe_selftest, as.double(x))
-
 test_that("both accumulators sum cancelling terms exactly", {
   expect_identical(selftest(c(1e20, 1, -1e20)), c(1, 1))
   expect_identical(selftest(c(1e16, 1, -1e16)), c(1, 1))
