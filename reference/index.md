@@ -19,6 +19,10 @@
   : Exactly rounded dot products and norms
 - [`xsum_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_mean.md)
   : Exactly rounded mean
+- [`xsum_rowsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
+  [`xsum_colsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
+  [`xsum_by()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
+  : Exactly rounded row, column and grouped sums
 - [`xsum_weighted_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_weighted_mean.md)
   : Weighted mean from exact sums
 - [`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md)

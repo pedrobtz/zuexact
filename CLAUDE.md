@@ -37,12 +37,14 @@ the accumulator values
 [`xsum_merge()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
 [`xsum_negate()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
 [`xsum_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
-[`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md))
+[`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)),
+[`xsum_rowsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md),
+[`xsum_colsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md),
+[`xsum_by()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
 and
 [`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md).
 xsum is vendored, patched, and checked by upstream’s own checker and
-fuzzer. Matrices, grouped sums and the C table are not built yet (Stages
-5 and 6).
+fuzzer. The C table for other packages is not built yet (Stage 6).
 
 ## Stage tracking
 
@@ -85,6 +87,7 @@ air format .                                     # format R sources
 tools/vendor/verify                              # vendored tree == upstream + patches
 tools/xsum-check/run [iters [seed]]              # upstream checker and fuzzer
 tools/run-benchmarks                             # small/large threshold (C, no R)
+Rscript -e 'devtools::load_all(); source("tools/bench/matrix.R")'  # matrix timings
 ```
 
 The first five are the development loop; the `tools/` scripts are for
@@ -143,10 +146,11 @@ vendoring changes and need `curl` and a C compiler.
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads
   the shared object’s exported and undefined symbols with `nm`;
   `helper-vendor.R` defines `selftest()`, which sums through both xsum
-  accumulators directly; `helper-oracle.R` holds the exact rational
-  oracle (`exact_sum()`, `exact_dot()`), whose `round_bigq()` exists
-  because gmp’s [`as.double()`](https://rdrr.io/r/base/double.html)
-  truncates instead of rounding.
+  accumulators directly; `helper-data.R` makes random matrices spread
+  over 80 binades; `helper-oracle.R` holds the exact rational oracle
+  (`exact_sum()`, `exact_dot()`), whose `round_bigq()` exists because
+  gmp’s [`as.double()`](https://rdrr.io/r/base/double.html) truncates
+  instead of rounding.
 
 ## Definition of done
 

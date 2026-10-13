@@ -47,3 +47,14 @@ Development version of the first release, 0.1.0. This heading becomes
   [`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
   build exact sums in pieces, in any order, and across processes (they
   serialise).
+
+- [`xsum_rowsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md),
+  [`xsum_colsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
+  and
+  [`xsum_by()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
+  are exact versions of
+  [`rowSums()`](https://rdrr.io/r/base/colSums.html),
+  [`colSums()`](https://rdrr.io/r/base/colSums.html) and
+  [`rowsum()`](https://rdrr.io/r/base/rowsum.html). Row sums work a
+  block of rows at a time, so their extra memory does not grow with the
+  number of rows.
