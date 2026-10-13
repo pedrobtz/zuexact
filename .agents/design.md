@@ -332,8 +332,9 @@ returning a NaN that looks like data.
 ## 7. The C table
 
 ```c
-/* registered with R_RegisterCCallable("zuexact", "zuexact_api_v1") */
-typedef struct {
+/* inst/include/zuexact.h; registered with
+   R_RegisterCCallable("zuexact", "zuexact_api_v1", ...) */
+typedef struct zuexact_api {
   size_t struct_size;
   size_t acc_size;                       /* bytes for one accumulator */
   void   (*init)(void *acc);
@@ -346,23 +347,37 @@ typedef struct {
   double (*round)(const void *acc);
   double (*div)(const void *acc, unsigned n); /* exactly rounded acc / n */
 } zuexact_api;
+
+static inline const zuexact_api *zuexact_api_get(void);  /* in the header */
 ```
 
+- What is registered is a function returning the table, not the table:
+  converting a data pointer to `DL_FUNC` is not ISO C, and `-pedantic`
+  warns. `zuexact_api_get()` in the header hides this.
 - The accumulator is opaque memory of `acc_size` bytes (a small
-  accumulator, 560 today), so a consumer can place one on the stack, in
-  a column-statistics struct or in an array of thousands without seeing
-  xsum's struct; the table follows `zuxml`'s versioning rules (append
-  members; bump the name for any layout change).
-- `addv` and `add_dot` use a stack-allocated large accumulator internally
-  when `n` is at or above the threshold, then fold it into the caller's
-  small one; the consumer never chooses.
+  accumulator, 560), aligned as a double, so a consumer can place one on
+  the stack, in a column-statistics struct or in an array of thousands
+  without seeing xsum's struct; the table follows `zuxml`'s versioning
+  rules (append members; bump the name for any layout change).
+- `addv` and `add_dot` use a large accumulator, from `malloc()`, when `n`
+  is at or above the threshold, then fold it into the caller's small one;
+  if `malloc()` fails they use the small one, slower but exact.
+- `round` and `div` work on a copy, because xsum's rounding may propagate
+  carries in place: the caller's accumulator is untouched, so several
+  threads may read one accumulator that none is writing. `merge` copies
+  `other` for the same reason.
 - Pure functions on caller memory: safe from any thread, including
   OpenMP workers in a consumer, each with its own accumulator. (Neal's
   api-doc is silent on threads; the code has no global state outside the
   debug flag, which the patch removes.)
-- The R-level `xsum_acc` bytes after the header are exactly the memory
-  this table operates on, so a consumer can hand an accumulator to R and
-  back.
+- Special values follow IEEE rules, not R's (§6): the table does not tell
+  `NA` from other NaNs and has no `na.rm`. The R functions apply R's rules
+  on top; a consumer that needs them tracks `NA` itself.
+- The bytes after an `xsum_acc` header are exactly the memory this table
+  operates on, so a consumer can hand an accumulator to R and back.
+- `tools/zuexacttest` is a consumer package; the `consumer.yaml` workflow
+  installs zuexact and it on Linux, macOS and Windows, R CMD checks it and
+  runs its tests.
 
 ## 8. The vendored library, as zuexact uses it
 

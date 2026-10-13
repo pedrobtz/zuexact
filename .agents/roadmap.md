@@ -30,7 +30,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | [#16](https://github.com/pedrobtz/zuexact/pull/16) | 2026-10-13 |
 | 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | [#17](https://github.com/pedrobtz/zuexact/pull/17) | 2026-10-13 |
 | 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | [#18](https://github.com/pedrobtz/zuexact/pull/18) | 2026-10-13 |
-| 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | | |
+| 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | [#19](https://github.com/pedrobtz/zuexact/pull/19) | 2026-10-13 |
 | 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | | |
 | 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | | |
 
@@ -351,6 +351,12 @@ it allocates itself, and a fixture package proves it in CI.
   stated in `inst/include/zuexact.h` and in `CLAUDE.md`.
 - A test that the bytes of an `xsum_acc` after its header are what the
   table's `round` accepts.
+
+**Deviation, 2026-10-13.** The fixture is `tools/zuexacttest` (zubin's
+layout, outside the CRAN tarball), not `tests/fixture/`. The registered
+callable is a function returning the table (design §7), and `round`/`div`
+take `const void *` and work on a copy. The versioning rules live in the
+header's comment and design §7.
 
 **Exit criteria.**
 - The fixture package installs against the built zuexact and its tests

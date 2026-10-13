@@ -33,3 +33,7 @@ Development version of the first release, 0.1.0. This heading becomes
 * `xsum_rowsums()`, `xsum_colsums()` and `xsum_by()` are exact versions of
   `rowSums()`, `colSums()` and `rowsum()`. Row sums work a block of rows at a
   time, so their extra memory does not grow with the number of rows.
+
+* A registered C interface, `zuexact_api_v1` in `inst/include/zuexact.h`,
+  gives other packages' C code the same exact accumulators, sums, dot
+  products, merges and means, through `LinkingTo: zuexact`.

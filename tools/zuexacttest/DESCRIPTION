@@ -1,0 +1,14 @@
+Package: zuexacttest
+Title: Fixture Consumer of the 'zuexact' C Interface
+Version: 0.0.1
+Authors@R: person("Pedro", "Baltazar", , "pedrobtz@gmail.com", role = c("aut", "cre"))
+Description: Test fixture for 'zuexact': a package that uses the registered
+    'zuexact' C table the way a real consumer would, through 'LinkingTo' and
+    'R_GetCCallable()'. Not for release.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1)
+Imports: zuexact
+LinkingTo: zuexact
+Suggests: testthat (>= 3.0.0)
+Config/testthat/edition: 3
