@@ -465,10 +465,18 @@ documented conditions:
   the result is `±Inf` (or `NaN`, per §6) even if the exact dot product is
   finite. Rescaling is out of scope; documented.
 
-`fma()` is C99 and correct on every platform; where the hardware has no
-FMA instruction the C library emulates it, slower but still exact.
-`zuexact_info()` reports whether the build used hardware FMA (the
-compile-time macro `__FP_FAST_FMA`).
+**Where the error term comes from (revised 2026-10-13).** Revision 2
+assumed `fma()` is correct on every platform. It is not: the mingw-w64 C
+runtime used by Rtools on Windows returned wrong error terms, caught by the
+ill-conditioned dot-product oracle in Stage 7. So `src/zxe_twoprod.h` uses
+`fma()` only when the compiler reports a hardware fused multiply-add
+(`FP_FAST_FMA`: ARM64, and x86-64 built for an FMA-capable CPU). Otherwise
+it uses Dekker's TwoProduct with Veltkamp's splitting, which needs only
+correctly rounded multiplication and addition; an operand above 2^995 is
+scaled by 2^-53 first so the split cannot overflow. Both branches agree bit
+for bit on 9.5 million products across the exponent range (checked against
+hardware `fma()` on ARM64), and the oracle tests run both, depending on the
+CI leg. `zuexact_info()$fma_hardware` reports which branch the build uses.
 
 ## 10. Errors
 
@@ -523,18 +531,28 @@ Every condition inherits `zuexact_error`:
 
 ## 12. Performance targets
 
-Measured by `tools/run-benchmarks` and recorded in the design:
+Targets, and what was measured on 2026-10-13 (macOS ARM64, R 4.6.1, the
+installed package built at `-O2`; `tools/bench/functions.R`, median of
+seven runs on 1e7 doubles unless stated):
 
-- For `n >= 10^6`, `xsum()` within 3× of base `sum()`. Note that base
-  `sum()` on x86-64 runs x87 `long double` arithmetic, which is slow, so
-  the honest second baseline is a plain `double` loop; both are recorded.
-- `xsum_dot()` within 4× of `crossprod()` on vectors (BLAS) for
-  `n >= 10^6`; AccurateArithmetic.jl's SIMD `dot_oro` is the reference
-  for what a compensated (not exact) product costs.
-- A streaming merge costs one accumulator addition (67 chunk adds) plus
-  a 560-byte copy.
-- `xsum_cumsum()` is recorded, not targeted: a round per element makes it
-  the slowest function, and the documentation says so.
+| Operation | Target | Measured | Baseline |
+| --- | --- | ---: | ---: |
+| `xsum()` | within 3× of `sum()` | 0.024 s (1.5×) | `sum()` 0.016 s |
+| `xsum_mean()` | — | 0.023 s | `mean()` 0.019 s |
+| `xsum_dot()` | within 4× of `crossprod()` | 0.049 s (2.5×) | `crossprod()` 0.020 s |
+| `xsum_merge()`, one call | one accumulator addition | 4 µs, mostly R call overhead | — |
+| `xsum_cumsum()`, 1e6 | recorded, not targeted | 0.073 s | `cumsum()` 0.001 s |
+
+- A plain double loop in byte-compiled R takes 0.167 s on the same data, so
+  the honest "plain double" baseline is base `sum()` itself on this
+  platform, where `long double` is `double`. On x86-64, base `sum()` runs
+  x87 arithmetic and is slower, which only flatters `xsum()`.
+- `xsum_dot()` costs a product split (`p = x*y`, `e = fma(x, y, -p)`) and
+  twice as many terms; in C alone the split and both additions take 17 ms
+  on 1e7 pairs, so the rest is memory traffic through R's vectors.
+- Measure from an installed package: `devtools::load_all()` compiles at
+  `-O0`, which doubled `xsum_dot()`'s time when first measured.
+- Row, column and grouped sums are measured in §4.
 
 ## 13. Build, portability and CRAN
 

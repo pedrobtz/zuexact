@@ -26,8 +26,9 @@ Verified 2026-10-13: Stages 0 to 4. Exported: `xsum()`, `xsum_mean()`,
 `xsum_rowsums()`, `xsum_colsums()`, `xsum_by()` and `zuexact_info()`, plus
 the registered C table `zuexact_api_v1` (`inst/include/zuexact.h`). xsum is
 vendored, patched, and checked by upstream's own checker and fuzzer. Left:
-the oracle and cross-platform suites, fuzzing and benchmarks (Stage 7), then
-release readiness (Stage 8).
+release readiness (Stage 8). Stage 7 added the oracle, ill-conditioned,
+test262 and cross-platform bits suites, the libFuzzer harness and the
+benchmarks.
 
 ## Stage tracking
 
@@ -67,7 +68,10 @@ air format .                                     # format R sources
 tools/vendor/verify                              # vendored tree == upstream + patches
 tools/xsum-check/run [iters [seed]]              # upstream checker and fuzzer
 tools/run-benchmarks                             # small/large threshold (C, no R)
-Rscript -e 'devtools::load_all(); source("tools/bench/matrix.R")'  # matrix timings
+R CMD INSTALL . && Rscript -e 'library(zuexact); source("tools/bench/functions.R")'
+R CMD INSTALL . && Rscript -e 'library(zuexact); source("tools/bench/matrix.R")'
+tools/write-bits                                 # rewrite the bits fixture (rarely)
+ZUEXACT_SLOW_TESTS=true Rscript -e 'devtools::test()'  # wider oracle sweeps
 ```
 
 The first five are the development loop; the `tools/` scripts are for
@@ -85,6 +89,18 @@ vendoring changes and need `curl` and a C compiler.
   because xsum keeps a single NaN by payload. Changing the layout means
   bumping the version byte; the C table (Stage 6) operates on the same bytes.
   Locals are zeroed before use so no uninitialised padding is serialised.
+- **Benchmark an installed package, never `load_all()`**, which compiles at
+  `-O0`: it doubled `xsum_dot()`'s time when first measured.
+- **`R_FINITE()` is a function call in package code** (`R_finite()`); hot
+  loops use C99 `isfinite()`.
+- **`tests/testthat/fixtures/bits.txt` is the cross-platform contract.** A
+  changed line is a portability bug, never a reason to rerun
+  `tools/write-bits`; that tool is for adding cases.
+- **Cross-platform inputs never come from decimal literals that are not
+  exact.** R's own parser differs between builds: on macOS ARM64 (no long
+  double) `1e308` reads as `0x1.1ccf385ebc8a3p+1023`, three ulps from the
+  correctly rounded `…8a0` that Linux gives. That broke the bits test once
+  (2026-10-13). Build such inputs from bit patterns (`from_hex()`).
 - **`ALTREP()` decides how a vector is read.** ALTREP vectors go through
   `*_GET_REGION` into a stack block; `REAL_RO()` on one would materialise it.
 
@@ -99,8 +115,12 @@ vendoring changes and need `curl` and a C compiler.
   the end and let `struct_size` tell consumers; any other change is a new
   name, `zuexact_api_v2`. `tools/zuexacttest` is the consumer that proves it
   (`consumer.yaml`).
+- **Never trust a software `fma()`.** mingw-w64's (Windows, Rtools) gave
+  wrong error terms. `src/zxe_twoprod.h` uses `fma()` only under
+  `FP_FAST_FMA` and Dekker's splitting otherwise; define `ZXE_NO_FMA` to
+  test the Dekker branch on a machine with hardware FMA.
 - **TwoProduct must not be contracted** (design §9, §13). The files that
-  split products with `fma()` (`zxe_dot.c`, `zxe_api.c`) carry
+  include `zxe_twoprod.h` (`zxe_dot.c`, `zxe_api.c`) carry
   `#pragma STDC FP_CONTRACT OFF` and keep `p = x*y` and
   `e = fma(x, y, -p)` in separate statements. `-ffp-contract=off` cannot be
   used: R CMD check reports `-f` flags as non-portable.
@@ -114,8 +134,12 @@ vendoring changes and need `curl` and a C compiler.
   `expect_error(..., class = "zuexact_invalid_argument")`.
 - **Order independence.** `devtools::test(shuffle = TRUE)` is part of done.
 - **Oracles before hand-written cases** (design §11): exact rationals with
-  `gmp`, `PreciseSums::fsum()`, the `Math.sumPrecise` test262 vectors, and the
-  Ogita–Rump–Oishi ill-conditioned generators.
+  `gmp` (`helper-oracle.R`), `PreciseSums::fsum()`, the `Math.sumPrecise`
+  test262 vectors (`fixtures/sumprecise/`, as bit patterns), and the
+  Ogita–Rump–Oishi ill-conditioned generators (`helper-illcond.R`).
+  `ZUEXACT_SLOW_TESTS=true` widens every sweep (family rule R7).
+- **Keep the CRAN suite under 15 s.** It ran in 6.6 s on 2026-10-13
+  (macOS ARM64, CRAN settings).
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads the
   shared object's exported and undefined symbols with `nm`; `helper-vendor.R`
   defines `selftest()`, which sums through both xsum accumulators directly;
@@ -159,7 +183,8 @@ quick on pull requests, full on `main`, `nold: true`), `coverage.yaml`
 (sanitizers, valgrind, LTO, gctorture, rchk, analyzers, CRAN special checks),
 `vendor.yaml`, `vendor-upstream.yaml` (weekly), and `xsum-check.yaml`
 (upstream's checker, fuzzer and the threshold benchmark on three OSes, outside
-R). `pkgdown.yaml` deploys with
+R), `consumer.yaml` (the C table from `tools/zuexacttest`) and `fuzz.yaml`
+(libFuzzer on `tools/fuzz/fuzz_xsum.c`, nightly for 30 minutes). `pkgdown.yaml` deploys with
 `force: false` so it does not overwrite the badge commit. The `full-ci` label
 runs the full profile on a pull request.
 

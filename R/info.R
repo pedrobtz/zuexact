@@ -11,8 +11,9 @@
 #' * `simd`: the SIMD instructions xsum was compiled to use: `"avx"`,
 #'   `"sse2"` or `"none"`.
 #' * `fma_hardware`: whether the compiler reported a hardware fused
-#'   multiply-add. Dot products are exact either way; a software `fma()` is
-#'   slower.
+#'   multiply-add. Dot products are exact either way: with it, each product's
+#'   error comes from `fma()`; without it, from Dekker's splitting algorithm,
+#'   because some C libraries' software `fma()` is not exact.
 #' * `long_double`: whether this R has long doubles, which is what makes
 #'   base [sum()] differ between platforms.
 #' @export

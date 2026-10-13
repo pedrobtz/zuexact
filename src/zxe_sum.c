@@ -167,7 +167,7 @@ static double finish(zxe_sum_state *st, SEXP args, int part, int mean,
   double r = mean ? zxe_acc_div(&st->acc[part], (unsigned) st->count)
                   : zxe_acc_round(&st->acc[part]);
   if (st->int_na) return NA_REAL;   /* NA_integer_ coerces to NA in either part */
-  if (R_FINITE(r)) return r;
+  if (isfinite(r)) return r;
   zxe_flags f = {0, 0, 0, 0};
   rescan(args, part, st->narm, &f);
   if (f.na) return NA_REAL;

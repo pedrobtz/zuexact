@@ -114,3 +114,14 @@ test_that("cumulative sums match xsum() of every prefix", {
     vapply(seq_along(x), function(i) xsum(x[seq_len(i)]), double(1))
   )
 })
+
+test_that("dot products are exact for operands near the top of the range", {
+  skip_if_not_installed("gmp")
+  # Without hardware FMA, TwoProduct splits the operands; above 2^995 it
+  # scales them first so the split cannot overflow (zxe_twoprod.h).
+  withr::local_seed(6)
+  x <- (2 * stats::runif(50) - 1) * 2^sample(996:1010, 50, TRUE)
+  y <- (2 * stats::runif(50) - 1) * 2^sample(-1000:-990, 50, TRUE)
+  expect_identical(xsum_dot(x, y), exact_dot(x, y))
+  expect_identical(xsum_dot(c(x, 1), c(y, 2^-40)), exact_dot(c(x, 1), c(y, 2^-40)))
+})

@@ -1,0 +1,20 @@
+#!/bin/sh
+# Write tests/testthat/fixtures/bits.txt: the bit patterns of every exact
+# function's results on fixed inputs (helper-bits.R). Run once, on any
+# platform, when the set of cases changes; test-bits.R then requires every CI
+# platform to reproduce it exactly. A change in an existing line is a bug,
+# never a reason to rewrite the file.
+set -eu
+cd "$(dirname "$0")/.."
+Rscript -e '
+  devtools::load_all(quiet = TRUE)
+  testthat::local_test_directory("tests/testthat")
+  for (f in c("helper-bits.R")) sys.source(f, envir = environment())
+  lines <- bits_results()
+  writeLines(c(
+    "# Written by tools/write-bits; compared by test-bits.R on every CI leg.",
+    paste("# Generated on", R.version$platform, "with", R.version.string),
+    lines
+  ), "fixtures/bits.txt")
+  cat(length(lines), "lines\n")
+'

@@ -1,16 +1,13 @@
-/* Design §9: exact dot products by TwoProduct. Each product x*y is split
-   into its rounded value p and its exact error e = fma(x, y, -p), and both
-   go into the accumulator, so the result is the correctly rounded exact
-   dot product (upstream's add_dot sums only the rounded products).
-
-   Exactness needs p and e to be computed as written: p a rounded multiply,
-   e an fma. The pragma forbids contraction in this file; the two are also
-   separate statements, so no expression holds both a multiply and an add.
+/* Design §9: exact dot products by TwoProduct (zxe_twoprod.h). Each
+   product x*y is split into its rounded value p and its exact error e, and
+   both go into the accumulator, so the result is the correctly rounded
+   exact dot product (upstream's add_dot sums only the rounded products).
    R CMD check reports -ffp-contract as a non-portable flag, so the pragma
-   and test-dot.R's canary are the guard. */
+   and the canary and oracle tests are the guard. */
 #pragma STDC FP_CONTRACT OFF
 
 #include "zxe_acc.h"
+#include "zxe_twoprod.h"
 #include <math.h>
 
 #define ZXE_BLOCK 2048
@@ -28,11 +25,7 @@ static void add_products(zxe_acc *a, const double *x, const double *y,
   for (R_xlen_t i = 0; i < n; i += ZXE_BLOCK) {
     R_xlen_t m = n - i < ZXE_BLOCK ? n - i : ZXE_BLOCK;
     for (R_xlen_t j = 0; j < m; j++) {
-      double xj = x[i + j], yj = y[i + j];
-      double pj = xj * yj;
-      double ej = fma(xj, yj, -pj);
-      p[j] = pj;
-      e[j] = R_FINITE(pj) ? ej : 0.0;
+      zxe_two_prod(x[i + j], y[i + j], &p[j], &e[j]);
     }
     zxe_acc_addv(a, p, m);
     zxe_acc_addv(a, e, m);
@@ -73,7 +66,7 @@ SEXP zxe_dot(SEXP x, SEXP y) {
   zxe_acc_init(&acc, 2 * n);
   add_products(&acc, px, py, n);
   double r = zxe_acc_round(&acc);
-  if (!R_FINITE(r)) {
+  if (!isfinite(r)) {
     dot_flags f = {0, 0, 0, 0};
     for (R_xlen_t i = 0; i < n; i++) {
       if (R_IsNA(px[i]) || R_IsNA(py[i])) {

@@ -31,7 +31,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | [#17](https://github.com/pedrobtz/zuexact/pull/17) | 2026-10-13 |
 | 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | [#18](https://github.com/pedrobtz/zuexact/pull/18) | 2026-10-13 |
 | 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | [#19](https://github.com/pedrobtz/zuexact/pull/19) | 2026-10-13 |
-| 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | | |
+| 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | [#20](https://github.com/pedrobtz/zuexact/pull/20) | 2026-10-13 |
 | 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | | |
 
 ## Stage 0 — Package identity
@@ -405,6 +405,23 @@ the performance targets are measured and recorded.
   `xsum_cumsum()` against `cumsum()`; results recorded in design §12 and
   compared with the targets, with the targets revised there if they were
   wrong.
+
+**Deviation, 2026-10-13.** `bits.txt` was written on macOS ARM64, not
+Linux; which platform writes it does not matter, since every leg must match
+it. The test262 vectors are stored as IEEE bit patterns (converted with
+Python's correctly rounded `float()`), because R's decimal parser is not
+guaranteed to round correctly on every build. The libFuzzer harness covers
+the vendored library and the accumulator operations zuexact builds on
+(small/large, merge, negate, divide, large-to-small), compiled without R;
+the R entry points are covered by the oracle and special-value suites, and
+`zufuzz` is not used. Benchmarks of the R functions are
+`tools/bench/functions.R`. `R_FINITE()` was replaced by C99 `isfinite()`
+in the hot loops: outside R itself it is a function call. The
+ill-conditioned dot-product oracle failed on Windows, because the mingw-w64
+`fma()` is not exact; TwoProduct now uses `fma()` only with hardware FMA
+and Dekker's splitting otherwise (`src/zxe_twoprod.h`, design §9). The bits
+fixture's `1e308` input is built from its bit pattern, because R's decimal
+parser reads that literal differently on builds without long doubles.
 
 **Exit criteria.**
 - The rational oracle and `PreciseSums::fsum()` agree with every zuexact

@@ -4,6 +4,7 @@
 
 #include "zxe_acc.h"
 #include <string.h>
+#include <math.h>
 
 /* Rows summed together in one block: one small accumulator (560 bytes) and
    one flag byte per row, so a block costs about 560 KB however many rows
@@ -36,7 +37,7 @@ static inline double elt(column_data c, R_xlen_t k) {
 /* Add v to one small accumulator with its flag byte. */
 static inline void add_cell(xsum_small_accumulator *a, unsigned char *f,
                             double v, int narm) {
-  if (!R_FINITE(v)) {
+  if (!isfinite(v)) {
     if (narm && ISNAN(v)) return;
     *f |= zxe_flag_of(v);
     if (ISNAN(v)) return;   /* flags decide; keep xsum's chunks finite */
@@ -70,7 +71,7 @@ SEXP zxe_colsums(SEXP x, SEXP nrow_, SEXP ncol_, SEXP narm_) {
       R_xlen_t m = nr - i < 4096 ? nr - i : 4096, k = 0;
       for (R_xlen_t t = 0; t < m; t++) {
         double v = elt(c, base + i + t);
-        if (!R_FINITE(v)) {
+        if (!isfinite(v)) {
           if (narm && ISNAN(v)) continue;
           f |= zxe_flag_of(v);
           if (ISNAN(v)) continue;
@@ -172,7 +173,7 @@ SEXP zxe_by(SEXP x, SEXP nrow_, SEXP ncol_, SEXP code_, SEXP ng_, SEXP narm_) {
           R_xlen_t m = hi - i < 4096 ? hi - i : 4096, k = 0;
           for (R_xlen_t t = 0; t < m; t++) {
             double v = elt(c, base + perm[i + t]);
-            if (!R_FINITE(v)) {
+            if (!isfinite(v)) {
               if (narm && ISNAN(v)) continue;
               f |= zxe_flag_of(v);
               if (ISNAN(v)) continue;
