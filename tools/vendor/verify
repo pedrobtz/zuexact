@@ -32,7 +32,19 @@ for f in $(cd "$ROOT" && find src/vendor -type f ! -name '*.o' ! -name '*.so' ! 
     fi
 done
 
-# 3. upstream at the pinned commit, plus the patches, reproduces the tree
+# 3. the version zuexact reports (src/zxe.h) is the one the manifest pins
+row=$(manifest_rows | awk -F'\t' '$1 == "xsum"')
+for pair in "ZXE_XSUM_VERSION:3" "ZXE_XSUM_COMMIT:4"; do
+    name=${pair%%:*}
+    want=$(field "$row" "${pair#*:}")
+    got=$(sed -n "s/^#define $name \"\(.*\)\"$/\1/p" "$ROOT/src/zxe.h")
+    if [ "$got" != "$want" ]; then
+        printf 'FAIL src/zxe.h %s is "%s", manifest says "%s"\n' "$name" "$got" "$want" >&2
+        status=1
+    fi
+done
+
+# 4. upstream at the pinned commit, plus the patches, reproduces the tree
 if [ "${1:-}" != "--offline" ]; then
     tmp=$(mktemp -d)
     trap 'rm -rf "$tmp"' EXIT

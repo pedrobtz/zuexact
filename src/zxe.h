@@ -16,6 +16,13 @@
 # define ZXE_LARGE_MIN 128
 #endif
 
+/* The vendored xsum. tools/vendor/verify checks these against
+   tools/vendor/manifest.tsv. */
+#define ZXE_XSUM_VERSION "stable-version-3"
+#define ZXE_XSUM_COMMIT "b766b3e104cdbd6769c8df033fb430700fce32dd"
+
 SEXP zxe_selftest(SEXP x);
+SEXP zxe_sum(SEXP args, SEXP narm);
+SEXP zxe_info(void);
 
 #endif
