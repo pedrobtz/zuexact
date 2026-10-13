@@ -36,3 +36,14 @@ Development version of the first release, 0.1.0. This heading becomes
 
 - [`xsum_cumsum()`](https://pedrobtz.github.io/zuexact/reference/xsum_cumsum.md)
   rounds every prefix sum exactly.
+
+- Accumulators as R values:
+  [`xsum_acc()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+  [`xsum_add()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+  [`xsum_merge()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+  [`xsum_negate()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+  [`xsum_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  and
+  [`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  build exact sums in pieces, in any order, and across processes (they
+  serialise).

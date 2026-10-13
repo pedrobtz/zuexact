@@ -4,6 +4,13 @@
 
 - [`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) :
   Exactly rounded sum
+- [`xsum_acc()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_add()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_merge()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_negate()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  : Accumulators: exact sums built in pieces
 - [`xsum_cumsum()`](https://pedrobtz.github.io/zuexact/reference/xsum_cumsum.md)
   : Exactly rounded cumulative sums
 - [`xsum_dot()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md)

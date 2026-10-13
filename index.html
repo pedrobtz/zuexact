@@ -57,13 +57,32 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e16</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1e16</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 1 on x86-64 Linux and Windows</span></span>
 <span><span class="co">#&gt; 0 on Apple Silicon</span></span></code></pre></div>
-<p>The exact answer is 1, everywhere. zuexact’s <code><a href="reference/xsum.html">xsum()</a></code> will return it on every platform.</p>
-<p><strong>Status:</strong> under development; nothing is implemented yet. The design is in <a href=".agents/design.html"><code>.agents/design.md</code></a> and the plan to the first CRAN release in <a href=".agents/roadmap.html"><code>.agents/roadmap.md</code></a>.</p>
+<p>The exact answer is 1, everywhere, and <code><a href="reference/xsum.html">xsum()</a></code> returns it on every platform:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pedrobtz.github.io/zuexact/">zuexact</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/xsum.html">xsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e16</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1e16</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="fu"><a href="reference/xsum.html">xsum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e20</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1e20</span><span class="op">)</span><span class="op">)</span>      <span class="co"># wrong on every platform with sum()</span></span>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="fu"><a href="reference/xsum_mean.html">xsum_mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1e15</span>, <span class="op">-</span><span class="fl">1e15</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.03333333</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="sums-in-pieces-and-across-processes">Sums in pieces, and across processes<a class="anchor" aria-label="anchor" href="#sums-in-pieces-and-across-processes"></a>
+</h2>
+<p>An accumulator holds an exact sum in progress. It is an ordinary R value, so an accumulator built on a worker comes back to the caller and merges there, in any order, with the same bits as summing everything at once:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">chunks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, length.out <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">accs</span> <span class="op">&lt;-</span> <span class="fu">parallel</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply</a></span><span class="op">(</span><span class="va">chunks</span>, <span class="va">xsum_acc</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/xsum_acc.html">xsum_value</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/funprog.html" class="external-link">Reduce</a></span><span class="op">(</span><span class="va">xsum_merge</span>, <span class="va">accs</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="reference/xsum.html">xsum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>The same works for Arrow record batches, DuckDB result chunks or files read in pieces: <code>acc &lt;- xsum_add(acc, chunk)</code> for each one, then <code>xsum_value(acc)</code>. <code>xsum_merge(a, xsum_negate(b))</code> is the exact difference of two sums.</p>
+<p><strong>Status:</strong> under development, towards the first CRAN release. The design is in <a href=".agents/design.html"><code>.agents/design.md</code></a> and the plan to the first CRAN release in <a href=".agents/roadmap.html"><code>.agents/roadmap.md</code></a>.</p>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of zuexact from <a href="https://github.com/pedrobtz/zuexact" class="external-link">GitHub</a> with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"pedrobtz/zuexact"</span><span class="op">)</span></span></code></pre></div>
 </div>

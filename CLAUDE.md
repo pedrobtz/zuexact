@@ -23,7 +23,7 @@ design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 to 3. Exported:
+Verified 2026-10-13: Stages 0 to 4. Exported:
 [`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md),
 [`xsum_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_mean.md),
 [`xsum_weighted_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_weighted_mean.md),
@@ -31,10 +31,18 @@ Verified 2026-10-13: Stages 0 to 3. Exported:
 [`xsum_dot()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
 [`xsum_sqnorm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
 [`xsum_norm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
+the accumulator values
+([`xsum_acc()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+[`xsum_add()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+[`xsum_merge()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+[`xsum_negate()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+[`xsum_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md),
+[`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md))
+and
 [`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md).
 xsum is vendored, patched, and checked by upstream’s own checker and
-fuzzer. Accumulator values, matrices, grouped sums and the C table are
-not built yet (Stages 4 to 6).
+fuzzer. Matrices, grouped sums and the C table are not built yet (Stages
+5 and 6).
 
 ## Stage tracking
 
@@ -89,6 +97,14 @@ vendoring changes and need `curl` and a C compiler.
   removed, including a complex element dropped because its *other* part
   is `NaN`; it once did not, and `xsum(c(NA, Inf), na.rm = TRUE)` gave
   `NA`.
+
+- **An `xsum_acc` is 568 raw bytes**: an 8-byte header (magic `ZXAC`,
+  layout version, byte order, special-value flags) and one xsum small
+  accumulator (`src/zxe_accval.c`). R’s `NA`/`NaN` distinction lives in
+  the header flags, because xsum keeps a single NaN by payload. Changing
+  the layout means bumping the version byte; the C table (Stage 6)
+  operates on the same bytes. Locals are zeroed before use so no
+  uninitialised padding is serialised.
 
 - **`ALTREP()` decides how a vector is read.** ALTREP vectors go through
   `*_GET_REGION` into a stack block; `REAL_RO()` on one would

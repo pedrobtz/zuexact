@@ -18,12 +18,43 @@ sum(c(1e16, 1, -1e16))
 #> 0 on Apple Silicon
 ```
 
-The exact answer is 1, everywhere. zuexact’s
-[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) will
-return it on every platform.
+The exact answer is 1, everywhere, and
+[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) returns
+it on every platform:
 
-**Status:** under development; nothing is implemented yet. The design is
-in
+``` r
+
+library(zuexact)
+xsum(c(1e16, 1, -1e16))
+#> [1] 1
+xsum(c(1e20, 1, -1e20))      # wrong on every platform with sum()
+#> [1] 1
+xsum_mean(c(1e15, -1e15, 0.1))
+#> [1] 0.03333333
+```
+
+## Sums in pieces, and across processes
+
+An accumulator holds an exact sum in progress. It is an ordinary R
+value, so an accumulator built on a worker comes back to the caller and
+merges there, in any order, with the same bits as summing everything at
+once:
+
+``` r
+
+chunks <- split(x, rep(1:8, length.out = length(x)))
+accs <- parallel::mclapply(chunks, xsum_acc)
+xsum_value(Reduce(xsum_merge, accs)) == xsum(x)
+#> [1] TRUE
+```
+
+The same works for Arrow record batches, DuckDB result chunks or files
+read in pieces: `acc <- xsum_add(acc, chunk)` for each one, then
+`xsum_value(acc)`. `xsum_merge(a, xsum_negate(b))` is the exact
+difference of two sums.
+
+**Status:** under development, towards the first CRAN release. The
+design is in
 [`.agents/design.md`](https://pedrobtz.github.io/zuexact/.agents/design.md)
 and the plan to the first CRAN release in
 [`.agents/roadmap.md`](https://pedrobtz.github.io/zuexact/.agents/roadmap.md).
@@ -45,6 +76,13 @@ pak::pak("pedrobtz/zuexact")
 
 - [`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) :
   Exactly rounded sum
+- [`xsum_acc()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_add()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_merge()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_negate()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  [`xsum_mean_value()`](https://pedrobtz.github.io/zuexact/reference/xsum_acc.md)
+  : Accumulators: exact sums built in pieces
 - [`xsum_cumsum()`](https://pedrobtz.github.io/zuexact/reference/xsum_cumsum.md)
   : Exactly rounded cumulative sums
 - [`xsum_dot()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md)
