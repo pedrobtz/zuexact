@@ -513,13 +513,16 @@ Measured by `tools/run-benchmarks` and recorded in the design:
 
 ## 13. Build, portability and CRAN
 
-C99; `#pragma STDC FP_CONTRACT OFF` at the top of the file holding
-zuexact's own TwoProduct code (the C99 guarantee that `p = x*y` and
-`fma(x, y, -p)` are not fused into one operation, which would make `e`
-zero), with `-ffp-contract=off` in `PKG_CFLAGS` as belt and braces where
-the compiler honours it; the two statements are also kept separate so
-that clang's default contraction mode, which fuses within an expression,
-has nothing to fuse. Hidden visibility; `R_init_zuexact` the only export;
+C99; `#pragma STDC FP_CONTRACT OFF` at the top of `src/zxe_dot.c`, the
+file holding zuexact's own TwoProduct code (the C99 guarantee that
+`p = x*y` and `fma(x, y, -p)` are not fused into one operation, which would
+make `e` zero), with the two kept as separate statements so that no
+expression holds both a multiply and an add; GCC, which ignores the pragma,
+contracts only a multiply whose every use is an addition, and `p` is also
+stored and negated. Revision 2 also planned `-ffp-contract=off` in
+`PKG_CFLAGS`; R CMD check reports every `-f` flag there as non-portable, so
+it is not used (2026-10-13). `test-dot.R` carries a canary that fails if the
+error term is lost. Hidden visibility; `R_init_zuexact` the only export;
 the C table registered. Stage 0 measures the small/large threshold, the
 AVX2 question (§8), and the effect of CRAN's `-O2` flags on xsum's
 manually optimised loops.

@@ -24,5 +24,8 @@
 SEXP zxe_selftest(SEXP x);
 SEXP zxe_sum(SEXP args, SEXP narm);
 SEXP zxe_info(void);
+SEXP zxe_mean(SEXP args, SEXP narm);
+SEXP zxe_dot(SEXP x, SEXP y);
+SEXP zxe_cumsum(SEXP x);
 
 #endif

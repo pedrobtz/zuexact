@@ -16,3 +16,12 @@ Development version of the first release, 0.1.0. This heading becomes
 
 * `zuexact_info()` reports the vendored 'xsum' version, the accumulator
   threshold, SIMD and FMA support, and whether R has long doubles.
+
+* `xsum_mean()` divides the exact sum by the count with one rounding;
+  `xsum_weighted_mean()` divides two exact sums.
+
+* `xsum_dot()`, `xsum_sqnorm()` and `xsum_norm()` include each product's
+  rounding error (TwoProduct with `fma()`), so dot products are exactly
+  rounded too.
+
+* `xsum_cumsum()` rounds every prefix sum exactly.

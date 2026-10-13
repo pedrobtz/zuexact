@@ -6,6 +6,9 @@ static const R_CallMethodDef call_methods[] = {
   {"zxe_selftest", (DL_FUNC) &zxe_selftest, 1},
   {"zxe_sum", (DL_FUNC) &zxe_sum, 2},
   {"zxe_info", (DL_FUNC) &zxe_info, 0},
+  {"zxe_mean", (DL_FUNC) &zxe_mean, 2},
+  {"zxe_dot", (DL_FUNC) &zxe_dot, 2},
+  {"zxe_cumsum", (DL_FUNC) &zxe_cumsum, 1},
   {NULL, NULL, 0}
 };
 

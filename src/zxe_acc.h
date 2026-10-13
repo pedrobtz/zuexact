@@ -38,4 +38,10 @@ static inline double zxe_acc_round(zxe_acc *a) {
   return a->large ? xsum_large_round(a->lacc) : xsum_small_round(&a->sacc);
 }
 
+/* The exactly rounded quotient of the exact sum by n (n >= 1). */
+static inline double zxe_acc_div(zxe_acc *a, unsigned n) {
+  return a->large ? xsum_large_div_unsigned(a->lacc, n)
+                  : xsum_small_div_unsigned(&a->sacc, n);
+}
+
 #endif

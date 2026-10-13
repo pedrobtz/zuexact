@@ -19,11 +19,11 @@ file: `CLAUDE.md` orients, the design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 to 2. `xsum()` and `zuexact_info()` are
-exported; `xsum()` follows design §6 on every platform. xsum is vendored,
-patched, and checked by upstream's own checker and fuzzer. Means, dot
-products, accumulators, matrices and the C table are not built yet (Stages 3
-to 6).
+Verified 2026-10-13: Stages 0 to 3. Exported: `xsum()`, `xsum_mean()`,
+`xsum_weighted_mean()`, `xsum_cumsum()`, `xsum_dot()`, `xsum_sqnorm()`,
+`xsum_norm()`, `zuexact_info()`. xsum is vendored, patched, and checked by
+upstream's own checker and fuzzer. Accumulator values, matrices, grouped sums
+and the C table are not built yet (Stages 4 to 6).
 
 ## Stage tracking
 
@@ -101,7 +101,10 @@ vendoring changes and need `curl` and a C compiler.
   Ogita–Rump–Oishi ill-conditioned generators.
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads the
   shared object's exported and undefined symbols with `nm`; `helper-vendor.R`
-  defines `selftest()`, which sums through both xsum accumulators directly.
+  defines `selftest()`, which sums through both xsum accumulators directly;
+  `helper-oracle.R` holds the exact rational oracle (`exact_sum()`,
+  `exact_dot()`), whose `round_bigq()` exists because gmp's `as.double()`
+  truncates instead of rounding.
 
 ## Definition of done
 
