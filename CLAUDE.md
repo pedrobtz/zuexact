@@ -42,9 +42,11 @@ the accumulator values
 [`xsum_colsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md),
 [`xsum_by()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md)
 and
-[`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md).
+[`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md),
+plus the registered C table `zuexact_api_v1` (`inst/include/zuexact.h`).
 xsum is vendored, patched, and checked by upstream’s own checker and
-fuzzer. The C table for other packages is not built yet (Stage 6).
+fuzzer. Left: the oracle and cross-platform suites, fuzzing and
+benchmarks (Stage 7), then release readiness (Stage 8).
 
 ## Stage tracking
 
@@ -126,9 +128,16 @@ vendoring changes and need `curl` and a C compiler.
   `exit` or RNG symbol. `tests/testthat/test-abi.R` audits both on Linux
   and macOS.
 
-- **TwoProduct must not be contracted** (design §9, §13). The file that
-  splits products with `fma()` carries `#pragma STDC FP_CONTRACT OFF`
-  and keeps `p = x*y` and `e = fma(x, y, -p)` in separate statements.
+- **The C table is append-only** (`inst/include/zuexact.h`). Add members
+  at the end and let `struct_size` tell consumers; any other change is a
+  new name, `zuexact_api_v2`. `tools/zuexacttest` is the consumer that
+  proves it (`consumer.yaml`).
+
+- **TwoProduct must not be contracted** (design §9, §13). The files that
+  split products with `fma()` (`zxe_dot.c`, `zxe_api.c`) carry
+  `#pragma STDC FP_CONTRACT OFF` and keep `p = x*y` and
+  `e = fma(x, y, -p)` in separate statements. `-ffp-contract=off` cannot
+  be used: R CMD check reports `-f` flags as non-portable.
 
 ## Testing conventions
 
