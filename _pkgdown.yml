@@ -2,3 +2,27 @@ url: https://pedrobtz.github.io/zuexact/
 template:
   bootstrap: 5
 
+reference:
+  - title: Sums
+    contents:
+      - xsum
+      - xsum_cumsum
+  - title: Means and products
+    contents:
+      - xsum_mean
+      - xsum_weighted_mean
+      - xsum_dot
+  - title: Matrices and groups
+    contents:
+      - xsum_rowsums
+  - title: Accumulators
+    contents:
+      - xsum_acc
+  - title: The build
+    contents:
+      - zuexact_info
+
+articles:
+  - title: Articles
+    contents:
+      - exact-summation
