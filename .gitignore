@@ -1,1 +1,19 @@
+# R and RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# R CMD build and check
+*.tar.gz
+*.Rcheck/
+
+# Built vignettes and pkgdown site
+inst/doc
 docs
+
+# macOS
+.DS_Store
+
+# Written by devtools::submit_cran()
+CRAN-SUBMISSION
