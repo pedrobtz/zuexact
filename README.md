@@ -49,13 +49,28 @@ The same works for Arrow record batches, DuckDB result chunks or files read
 in pieces: `acc <- xsum_add(acc, chunk)` for each one, then `xsum_value(acc)`.
 `xsum_merge(a, xsum_negate(b))` is the exact difference of two sums.
 
-**Status:** under development, towards the first CRAN release. The design is in
-[`.agents/design.md`](.agents/design.md) and the plan to the first CRAN
-release in [`.agents/roadmap.md`](.agents/roadmap.md).
+## What else is in the package
+
+* `xsum_mean()`, `xsum_weighted_mean()`: exact means.
+* `xsum_dot()`, `xsum_sqnorm()`, `xsum_norm()`: dot products and norms with
+  each product's rounding error included.
+* `xsum_cumsum()`, `xsum_rowsums()`, `xsum_colsums()`, `xsum_by()`: exact
+  versions of `cumsum()`, `rowSums()`, `colSums()` and `rowsum()`.
+* A registered C interface, `<zuexact.h>`, for other packages' compiled code.
+
+`vignette("exact-summation")` explains the details. For compensated
+summation (Kahan, Neumaier, pairwise), which is faster but not exact, see
+[PreciseSums](https://CRAN.R-project.org/package=PreciseSums).
 
 ## Installation
 
-You can install the development version of zuexact from
+Install the released version from CRAN with:
+
+``` r
+install.packages("zuexact")
+```
+
+or the development version from
 [GitHub](https://github.com/pedrobtz/zuexact) with:
 
 ``` r

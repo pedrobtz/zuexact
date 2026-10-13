@@ -57,3 +57,16 @@ cond_sum <- function(x) {
 slow_tests <- function() {
   identical(Sys.getenv("ZUEXACT_SLOW_TESTS"), "true")
 }
+
+# Set by the gctorture leg (family rule R7): the oracle sweeps are pure-R
+# arithmetic on many inputs, which gctorture makes very slow and which adds
+# no memory-safety signal beyond the first few inputs.
+heavy_skipped <- function() {
+  identical(Sys.getenv("ZUEXACT_SKIP_HEAVY"), "true")
+}
+
+# Repetitions for a sweep: `slow` with ZUEXACT_SLOW_TESTS, 2 under
+# ZUEXACT_SKIP_HEAVY, `normal` otherwise.
+sweep_reps <- function(normal, slow) {
+  if (slow_tests()) slow else if (heavy_skipped()) 2L else normal
+}

@@ -19,16 +19,16 @@ file: `CLAUDE.md` orients, the design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 to 4. Exported: `xsum()`, `xsum_mean()`,
-`xsum_weighted_mean()`, `xsum_cumsum()`, `xsum_dot()`, `xsum_sqnorm()`,
-`xsum_norm()`, the accumulator values (`xsum_acc()`, `xsum_add()`,
-`xsum_merge()`, `xsum_negate()`, `xsum_value()`, `xsum_mean_value()`),
-`xsum_rowsums()`, `xsum_colsums()`, `xsum_by()` and `zuexact_info()`, plus
-the registered C table `zuexact_api_v1` (`inst/include/zuexact.h`). xsum is
-vendored, patched, and checked by upstream's own checker and fuzzer. Left:
-release readiness (Stage 8). Stage 7 added the oracle, ill-conditioned,
-test262 and cross-platform bits suites, the libFuzzer harness and the
-benchmarks.
+Verified 2026-10-13: every roadmap stage is implemented and the package is at
+version 0.1.0, ready for the CRAN-submission issue (#12). Exported: `xsum()`,
+`xsum_mean()`, `xsum_weighted_mean()`, `xsum_cumsum()`, `xsum_dot()`,
+`xsum_sqnorm()`, `xsum_norm()`, the accumulator values (`xsum_acc()`,
+`xsum_add()`, `xsum_merge()`, `xsum_negate()`, `xsum_value()`,
+`xsum_mean_value()`), `xsum_rowsums()`, `xsum_colsums()`, `xsum_by()` and
+`zuexact_info()`, plus the registered C table `zuexact_api_v1`
+(`inst/include/zuexact.h`). Results are proven against exact rationals,
+`PreciseSums::fsum()`, the test262 vectors and ill-conditioned inputs, and
+must be bit-identical on every CI leg.
 
 ## Stage tracking
 
@@ -137,7 +137,9 @@ vendoring changes and need `curl` and a C compiler.
   `gmp` (`helper-oracle.R`), `PreciseSums::fsum()`, the `Math.sumPrecise`
   test262 vectors (`fixtures/sumprecise/`, as bit patterns), and the
   Ogita–Rump–Oishi ill-conditioned generators (`helper-illcond.R`).
-  `ZUEXACT_SLOW_TESTS=true` widens every sweep (family rule R7).
+  `ZUEXACT_SLOW_TESTS=true` widens every sweep and `ZUEXACT_SKIP_HEAVY=true`
+  (set by the gctorture leg) shrinks it to two inputs (family rule R7,
+  `sweep_reps()` in `helper-illcond.R`).
 - **Keep the CRAN suite under 15 s.** It ran in 6.6 s on 2026-10-13
   (macOS ARM64, CRAN settings).
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads the

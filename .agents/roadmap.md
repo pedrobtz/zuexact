@@ -32,7 +32,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | [#18](https://github.com/pedrobtz/zuexact/pull/18) | 2026-10-13 |
 | 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | [#19](https://github.com/pedrobtz/zuexact/pull/19) | 2026-10-13 |
 | 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | [#20](https://github.com/pedrobtz/zuexact/pull/20) | 2026-10-13 |
-| 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | | |
+| 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | [#21](https://github.com/pedrobtz/zuexact/pull/21) | 2026-10-13 |
 
 ## Stage 0 — Package identity
 
@@ -461,6 +461,14 @@ parser reads that literal differently on builds without long doubles.
 - `CLAUDE.md` current-state paragraph updated and dated; design §12
   numbers final; the RFC copy in `pedrobtz/packages` synced to this
   design.
+
+**Review, 2026-10-13.** The `pkg-cran-review` skill was run on this
+branch. `R CMD check --as-cran` with remote checks gave two NOTEs: "New
+submission" and a local HTML Tidy too old to validate the manual (an
+environment limitation, not the package). Two findings were fixed:
+`cran-comments.md` claimed a NOSUGGESTS check that CI does not run, and the
+README lacked the CRAN install line. `urlchecker::url_check()` and
+`spelling::spell_check_package()` are clean.
 
 **Exit criteria.**
 - A full-profile r-actions run is green on the release commit, including

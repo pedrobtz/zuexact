@@ -32,6 +32,10 @@ jobs:
   gctorture:
     uses: pedrobtz/r-actions/.github/workflows/gctorture.yml@v1
     with:
+      # Family rule R7: shrink the pure-R oracle sweeps, which took the
+      # step-20 run to 52 minutes (2026-10-13) without adding signal.
+      env: |
+        ZUEXACT_SKIP_HEAVY=true
       profile: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'full-ci') && 'quick' || 'full' }}
 
   rchk:
