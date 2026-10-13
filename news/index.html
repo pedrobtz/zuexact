@@ -37,6 +37,8 @@
 <p>Development version of the first release, 0.1.0. This heading becomes <code># zuexact 0.1.0</code> in the last roadmap stage.</p>
 <ul><li><p>Package identity: real <code>DESCRIPTION</code>, licence and copyright files, hidden symbols, and CI on the R build without long doubles.</p></li>
 <li><p>Vendors Radford Neal’s ‘xsum’ (stable version 3), patched so that no standard I/O reaches the compiled code; upstream’s checker and fuzzer run against the vendored copy in CI.</p></li>
+<li><p><code><a href="../reference/xsum.html">xsum()</a></code> returns the exactly rounded sum of double, integer, logical and complex vectors, with <code>na.rm</code>, applying the same special-value rules on every platform. ALTREP vectors are read in blocks, never materialised.</p></li>
+<li><p><code><a href="../reference/zuexact_info.html">zuexact_info()</a></code> reports the vendored ‘xsum’ version, the accumulator threshold, SIMD and FMA support, and whether R has long doubles.</p></li>
 </ul></div>
   </main></div>
 

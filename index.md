@@ -18,8 +18,9 @@ sum(c(1e16, 1, -1e16))
 #> 0 on Apple Silicon
 ```
 
-The exact answer is 1, everywhere. zuexact’s `xsum()` will return it on
-every platform.
+The exact answer is 1, everywhere. zuexact’s
+[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) will
+return it on every platform.
 
 **Status:** under development; nothing is implemented yet. The design is
 in

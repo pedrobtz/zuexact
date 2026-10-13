@@ -11,3 +11,13 @@ Development version of the first release, 0.1.0. This heading becomes
 - Vendors Radford Neal’s ‘xsum’ (stable version 3), patched so that no
   standard I/O reaches the compiled code; upstream’s checker and fuzzer
   run against the vendored copy in CI.
+
+- [`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md)
+  returns the exactly rounded sum of double, integer, logical and
+  complex vectors, with `na.rm`, applying the same special-value rules
+  on every platform. ALTREP vectors are read in blocks, never
+  materialised.
+
+- [`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md)
+  reports the vendored ‘xsum’ version, the accumulator threshold, SIMD
+  and FMA support, and whether R has long doubles.

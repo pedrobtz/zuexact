@@ -8,11 +8,12 @@ with code in this repository.
 zuexact computes sums of doubles exactly and rounds once, so results are
 the correctly rounded true value on every platform and in every element
 order. It vendors Radford Neal’s `xsum` (MIT) and exposes it as R
-functions with the `xsum_` prefix (`xsum()` itself is the main entry
-point) and as a registered C table for other packages. Zero hard runtime
-dependencies. It never does arbitrary precision, decimals, or
-compensated-but-inexact summation (Kahan and friends live in
-`PreciseSums`).
+functions with the `xsum_` prefix
+([`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) itself
+is the main entry point) and as a registered C table for other packages.
+Zero hard runtime dependencies. It never does arbitrary precision,
+decimals, or compensated-but-inexact summation (Kahan and friends live
+in `PreciseSums`).
 
 [`.agents/design.md`](https://pedrobtz.github.io/zuexact/.agents/design.md)
 is the specification and
@@ -22,11 +23,14 @@ design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 and 1. xsum is vendored, patched and
-compiled into `zuexact.so`; upstream’s checker and fuzzer pass against
-it on Linux, macOS and Windows. The only entry point is the internal
-`zxe_selftest()` (both accumulators over one vector). No exported R
-function exists yet (Stage 2).
+Verified 2026-10-13: Stages 0 to 2.
+[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) and
+[`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md)
+are exported;
+[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) follows
+design §6 on every platform. xsum is vendored, patched, and checked by
+upstream’s own checker and fuzzer. Means, dot products, accumulators,
+matrices and the C table are not built yet (Stages 3 to 6).
 
 ## Stage tracking
 
@@ -76,14 +80,26 @@ vendoring changes and need `curl` and a C compiler.
 
 ## Invariants that are easy to break
 
+- **One pass, then a rescan only when the result is not finite**
+  (`src/zxe_sum.c`). The rescan must skip exactly what `na.rm = TRUE`
+  removed, including a complex element dropped because its *other* part
+  is `NaN`; it once did not, and `xsum(c(NA, Inf), na.rm = TRUE)` gave
+  `NA`.
+
+- **`ALTREP()` decides how a vector is read.** ALTREP vectors go through
+  `*_GET_REGION` into a stack block; `REAL_RO()` on one would
+  materialise it.
+
 - **One rounding.** Every function rounds the exact value once, except
   where its documentation states the count (`xsum_norm()` two,
   `xsum_weighted_mean()` three). Never add an intermediate `double`
   between accumulation and the final round.
+
 - **`zuexact.so` exports `R_init_zuexact` only** (`$(C_VISIBILITY)` in
   `src/Makevars` and `src/Makevars.win`), and links no stdio, `abort`,
   `exit` or RNG symbol. `tests/testthat/test-abi.R` audits both on Linux
   and macOS.
+
 - **TwoProduct must not be contracted** (design §9, §13). The file that
   splits products with `fma()` carries `#pragma STDC FP_CONTRACT OFF`
   and keeps `p = x*y` and `e = fma(x, y, -p)` in separate statements.
@@ -102,7 +118,9 @@ vendoring changes and need `curl` and a C compiler.
   with `gmp`, `PreciseSums::fsum()`, the `Math.sumPrecise` test262
   vectors, and the Ogita–Rump–Oishi ill-conditioned generators.
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads
-  the shared object’s exported and undefined symbols with `nm`.
+  the shared object’s exported and undefined symbols with `nm`;
+  `helper-vendor.R` defines `selftest()`, which sums through both xsum
+  accumulators directly.
 
 ## Definition of done
 

@@ -38,12 +38,12 @@
 <p>This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.</p>
 <div class="section level2">
 <h2 id="what-this-is">What this is<a class="anchor" aria-label="anchor" href="#what-this-is"></a></h2>
-<p>zuexact computes sums of doubles exactly and rounds once, so results are the correctly rounded true value on every platform and in every element order. It vendors Radford Neal’s <code>xsum</code> (MIT) and exposes it as R functions with the <code>xsum_</code> prefix (<code>xsum()</code> itself is the main entry point) and as a registered C table for other packages. Zero hard runtime dependencies. It never does arbitrary precision, decimals, or compensated-but-inexact summation (Kahan and friends live in <code>PreciseSums</code>).</p>
+<p>zuexact computes sums of doubles exactly and rounds once, so results are the correctly rounded true value on every platform and in every element order. It vendors Radford Neal’s <code>xsum</code> (MIT) and exposes it as R functions with the <code>xsum_</code> prefix (<code><a href="reference/xsum.html">xsum()</a></code> itself is the main entry point) and as a registered C table for other packages. Zero hard runtime dependencies. It never does arbitrary precision, decimals, or compensated-but-inexact summation (Kahan and friends live in <code>PreciseSums</code>).</p>
 <p><a href=".agents/design.html"><code>.agents/design.md</code></a> is the specification and <a href=".agents/roadmap.html"><code>.agents/roadmap.md</code></a> the plan to 0.1.0. They outrank this file: <code>CLAUDE.md</code> orients, the design decides.</p>
 </div>
 <div class="section level2">
 <h2 id="current-state">Current state<a class="anchor" aria-label="anchor" href="#current-state"></a></h2>
-<p>Verified 2026-10-13: Stages 0 and 1. xsum is vendored, patched and compiled into <code>zuexact.so</code>; upstream’s checker and fuzzer pass against it on Linux, macOS and Windows. The only entry point is the internal <code>zxe_selftest()</code> (both accumulators over one vector). No exported R function exists yet (Stage 2).</p>
+<p>Verified 2026-10-13: Stages 0 to 2. <code><a href="reference/xsum.html">xsum()</a></code> and <code><a href="reference/zuexact_info.html">zuexact_info()</a></code> are exported; <code><a href="reference/xsum.html">xsum()</a></code> follows design §6 on every platform. xsum is vendored, patched, and checked by upstream’s own checker and fuzzer. Means, dot products, accumulators, matrices and the C table are not built yet (Stages 3 to 6).</p>
 </div>
 <div class="section level2">
 <h2 id="stage-tracking">Stage tracking<a class="anchor" aria-label="anchor" href="#stage-tracking"></a></h2>
@@ -77,12 +77,11 @@
 </div>
 <div class="section level2">
 <h2 id="invariants-that-are-easy-to-break">Invariants that are easy to break<a class="anchor" aria-label="anchor" href="#invariants-that-are-easy-to-break"></a></h2>
-<ul><li>
-<strong>One rounding.</strong> Every function rounds the exact value once, except where its documentation states the count (<code>xsum_norm()</code> two, <code>xsum_weighted_mean()</code> three). Never add an intermediate <code>double</code> between accumulation and the final round.</li>
-<li>
-<strong><code>zuexact.so</code> exports <code>R_init_zuexact</code> only</strong> (<code>$(C_VISIBILITY)</code> in <code>src/Makevars</code> and <code>src/Makevars.win</code>), and links no stdio, <code>abort</code>, <code>exit</code> or RNG symbol. <code>tests/testthat/test-abi.R</code> audits both on Linux and macOS.</li>
-<li>
-<strong>TwoProduct must not be contracted</strong> (design §9, §13). The file that splits products with <code>fma()</code> carries <code>#pragma STDC FP_CONTRACT OFF</code> and keeps <code>p = x*y</code> and <code>e = fma(x, y, -p)</code> in separate statements.</li>
+<ul><li><p><strong>One pass, then a rescan only when the result is not finite</strong> (<code>src/zxe_sum.c</code>). The rescan must skip exactly what <code>na.rm = TRUE</code> removed, including a complex element dropped because its <em>other</em> part is <code>NaN</code>; it once did not, and <code>xsum(c(NA, Inf), na.rm = TRUE)</code> gave <code>NA</code>.</p></li>
+<li><p><strong><code>ALTREP()</code> decides how a vector is read.</strong> ALTREP vectors go through <code>*_GET_REGION</code> into a stack block; <code>REAL_RO()</code> on one would materialise it.</p></li>
+<li><p><strong>One rounding.</strong> Every function rounds the exact value once, except where its documentation states the count (<code>xsum_norm()</code> two, <code>xsum_weighted_mean()</code> three). Never add an intermediate <code>double</code> between accumulation and the final round.</p></li>
+<li><p><strong><code>zuexact.so</code> exports <code>R_init_zuexact</code> only</strong> (<code>$(C_VISIBILITY)</code> in <code>src/Makevars</code> and <code>src/Makevars.win</code>), and links no stdio, <code>abort</code>, <code>exit</code> or RNG symbol. <code>tests/testthat/test-abi.R</code> audits both on Linux and macOS.</p></li>
+<li><p><strong>TwoProduct must not be contracted</strong> (design §9, §13). The file that splits products with <code>fma()</code> carries <code>#pragma STDC FP_CONTRACT OFF</code> and keeps <code>p = x*y</code> and <code>e = fma(x, y, -p)</code> in separate statements.</p></li>
 </ul></div>
 <div class="section level2">
 <h2 id="testing-conventions">Testing conventions<a class="anchor" aria-label="anchor" href="#testing-conventions"></a></h2>
@@ -95,7 +94,7 @@
 <li>
 <strong>Oracles before hand-written cases</strong> (design §11): exact rationals with <code>gmp</code>, <code>PreciseSums::fsum()</code>, the <code>Math.sumPrecise</code> test262 vectors, and the Ogita–Rump–Oishi ill-conditioned generators.</li>
 <li>
-<strong>Helpers</strong> live in <code>tests/testthat/helper-*.R</code>: <code>helper-abi.R</code> reads the shared object’s exported and undefined symbols with <code>nm</code>.</li>
+<strong>Helpers</strong> live in <code>tests/testthat/helper-*.R</code>: <code>helper-abi.R</code> reads the shared object’s exported and undefined symbols with <code>nm</code>; <code>helper-vendor.R</code> defines <code>selftest()</code>, which sums through both xsum accumulators directly.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="definition-of-done">Definition of done<a class="anchor" aria-label="anchor" href="#definition-of-done"></a></h2>
