@@ -29,7 +29,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 2 | [Exact sums and special values](#stage-2--exact-sums-and-special-values) | [#5](https://github.com/pedrobtz/zuexact/issues/5) | [#15](https://github.com/pedrobtz/zuexact/pull/15) | 2026-10-13 |
 | 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | [#16](https://github.com/pedrobtz/zuexact/pull/16) | 2026-10-13 |
 | 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | [#17](https://github.com/pedrobtz/zuexact/pull/17) | 2026-10-13 |
-| 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | | |
+| 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | | 2026-10-13 |
 | 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | | |
 | 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | | |
 | 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | | |
@@ -312,6 +312,12 @@ exactly rounded sums with the shapes of `rowSums()`, `colSums()` and
   matrix (1e7 × 3) whose row sums must not allocate 560 bytes × `nrow`
   (checked with `bench::mark()` memory or `gc()` deltas); `NA` placement
   per row; a factor with unused levels.
+
+**Deviation, 2026-10-13.** The matrix benchmarks are an R script,
+`tools/bench/matrix.R`, not part of `tools/run-benchmarks`, which measures
+the C library without R. Data frames of numeric columns are accepted too,
+as base `rowSums()` accepts them. "Peak extra allocation" is measured
+beyond the input and the result vector (an 80 MB result for 1e7 rows).
 
 **Exit criteria.**
 - Row sums of a 1e7 × 3 double matrix run with peak extra allocation

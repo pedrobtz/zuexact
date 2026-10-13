@@ -29,3 +29,7 @@ Development version of the first release, 0.1.0. This heading becomes
 * Accumulators as R values: `xsum_acc()`, `xsum_add()`, `xsum_merge()`,
   `xsum_negate()`, `xsum_value()` and `xsum_mean_value()` build exact sums
   in pieces, in any order, and across processes (they serialise).
+
+* `xsum_rowsums()`, `xsum_colsums()` and `xsum_by()` are exact versions of
+  `rowSums()`, `colSums()` and `rowsum()`. Row sums work a block of rows at a
+  time, so their extra memory does not grow with the number of rows.

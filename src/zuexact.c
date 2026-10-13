@@ -14,6 +14,9 @@ static const R_CallMethodDef call_methods[] = {
   {"zxe_acc_merge", (DL_FUNC) &zxe_acc_merge, 2},
   {"zxe_acc_negate", (DL_FUNC) &zxe_acc_negate, 1},
   {"zxe_acc_value", (DL_FUNC) &zxe_acc_value, 2},
+  {"zxe_colsums", (DL_FUNC) &zxe_colsums, 4},
+  {"zxe_rowsums", (DL_FUNC) &zxe_rowsums, 4},
+  {"zxe_by", (DL_FUNC) &zxe_by, 6},
   {NULL, NULL, 0}
 };
 
