@@ -1,4 +1,4 @@
 PKG_CPPFLAGS = -Ivendor/xsum
 PKG_CFLAGS = $(C_VISIBILITY)
 
-OBJECTS = zuexact.o zxe_selftest.o vendor/xsum/xsum.o
+OBJECTS = zuexact.o zxe_selftest.o zxe_sum.o zxe_info.o vendor/xsum/xsum.o
