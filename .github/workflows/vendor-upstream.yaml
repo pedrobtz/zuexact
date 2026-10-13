@@ -1,0 +1,24 @@
+# Weekly: open an issue when xsum has a stable tag newer than the one pinned
+# in tools/vendor/manifest.tsv. Upstream tags stable versions without
+# publishing releases, so the watcher matches tags.
+on:
+  schedule:
+    - cron: "41 6 * * 1"
+  workflow_dispatch:
+
+name: vendor-upstream
+
+permissions:
+  contents: read
+
+jobs:
+  upstream:
+    # Holds a write token (issues), so pinned to a commit.
+    uses: pedrobtz/r-actions/.github/workflows/vendor-upstream.yml@17264ce002a9359a492e0183852a555a5bb866e7 # v1.23.0
+    permissions:
+      contents: read
+      issues: write
+    with:
+      upstream-repo: radfordneal/xsum
+      current-version: awk -F'\t' '$1 == "xsum" { print $3 }' tools/vendor/manifest.tsv
+      tag-pattern: stable-version-*

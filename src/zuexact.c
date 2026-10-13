@@ -1,10 +1,9 @@
-#define R_NO_REMAP
-#include <R.h>
-#include <Rinternals.h>
+#include "zxe.h"
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
 
 static const R_CallMethodDef call_methods[] = {
+  {"zxe_selftest", (DL_FUNC) &zxe_selftest, 1},
   {NULL, NULL, 0}
 };
 

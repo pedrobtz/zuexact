@@ -25,7 +25,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | Stage | Title | Issue | Pull request | Done |
 | --- | --- | --- | --- | --- |
 | 0 | [Package identity](#stage-0--package-identity) | [#3](https://github.com/pedrobtz/zuexact/issues/3) | [#13](https://github.com/pedrobtz/zuexact/pull/13) | 2026-10-13 |
-| 1 | [Vendor, patch and measure xsum](#stage-1--vendor-patch-and-measure-xsum) | [#4](https://github.com/pedrobtz/zuexact/issues/4) | | |
+| 1 | [Vendor, patch and measure xsum](#stage-1--vendor-patch-and-measure-xsum) | [#4](https://github.com/pedrobtz/zuexact/issues/4) | [#14](https://github.com/pedrobtz/zuexact/pull/14) | 2026-10-13 |
 | 2 | [Exact sums and special values](#stage-2--exact-sums-and-special-values) | [#5](https://github.com/pedrobtz/zuexact/issues/5) | | |
 | 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | | |
 | 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | | |
@@ -119,6 +119,20 @@ measured and written down. No R function yet.
 - A hidden `.Call()` entry, `zxe_selftest()`, that sums a fixed vector
   through small and large accumulators so a testthat file exercises the
   vendored code before Stage 2 exists.
+
+**Deviation, 2026-10-13.** File layout follows the r-actions `vendor.yml`
+defaults and the family's package template rather than the paths written
+above: `src/vendor/xsum/` (not `src/xsum/`); `tools/vendor/manifest.tsv` and
+`tools/vendor/checksums.sha256` (not `src/xsum/VERSION`);
+`tools/patches/xsum/0001-no-stdio-exact-only.patch` (not `src/xsum/PATCH`);
+`tools/vendor/{fetch,verify}` (not `tools/vendor-xsum`);
+`tools/xsum-check/run` (not `tools/check-xsum`). The non-exact routines are
+removed by the patch and not kept under `tools/bench/`: the benchmark needs
+only the exact routines. The full r-actions native-checks set (sanitizers,
+valgrind, LTO, gctorture, rchk, analyzers, CRAN special checks) is adopted
+instead of the sanitizers workflow alone. The threshold is per architecture (384 on ARM64, 128 elsewhere) rather
+than one constant, because one constant costs 1.5× on some platform (design
+§8). Scope is unchanged.
 
 **Exit criteria.**
 - `R CMD check` passes on every full-profile leg; the shared object

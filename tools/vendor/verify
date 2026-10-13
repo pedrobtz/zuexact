@@ -1,0 +1,53 @@
+#!/bin/sh
+# Check that src/vendor/ is exactly upstream at the pinned commit plus exactly
+# the patches in tools/patches/, and that every file matches checksums.sha256.
+#
+#   tools/vendor/verify            offline checksum check, then the upstream
+#                                  rebuild (needs curl and network)
+#   tools/vendor/verify --offline  checksum check only
+. "$(dirname "$0")/common.sh"
+
+status=0
+
+# 1. every recorded file still hashes to the recorded value
+while read -r want path; do
+    [ -n "$want" ] || continue
+    if [ ! -f "$ROOT/$path" ]; then
+        printf 'FAIL missing vendored file: %s\n' "$path" >&2
+        status=1
+        continue
+    fi
+    got=$(sha256 "$ROOT/$path")
+    if [ "$got" != "$want" ]; then
+        printf 'FAIL modified vendored file: %s\n' "$path" >&2
+        status=1
+    fi
+done < "$CHECKSUMS"
+
+# 2. no vendored file that checksums.sha256 does not know about
+for f in $(cd "$ROOT" && find src/vendor -type f ! -name '*.o' ! -name '*.so' ! -name '*.dll' | LC_ALL=C sort); do
+    if ! grep -q "  $f\$" "$CHECKSUMS"; then
+        printf 'FAIL unrecorded vendored file: %s\n' "$f" >&2
+        status=1
+    fi
+done
+
+# 3. upstream at the pinned commit, plus the patches, reproduces the tree
+if [ "${1:-}" != "--offline" ]; then
+    tmp=$(mktemp -d)
+    trap 'rm -rf "$tmp"' EXIT
+    manifest_rows | while IFS= read -r row; do
+        src=$(field "$row" 1)
+        fetch_row "$row" "$tmp/$src"
+        if ! diff -r "$tmp/$src" "$VENDOR/$src" >/dev/null; then
+            printf 'FAIL src/vendor/%s is not upstream plus tools/patches/%s\n' "$src" "$src" >&2
+            diff -ru "$tmp/$src" "$VENDOR/$src" >&2 || true
+            exit 1
+        fi
+    done || status=1
+fi
+
+if [ "$status" -eq 0 ]; then
+    echo "vendor tree verified"
+fi
+exit "$status"

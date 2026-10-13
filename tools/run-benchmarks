@@ -1,0 +1,30 @@
+#!/bin/sh
+# Benchmarks of the vendored xsum, outside R (design §8, §12).
+#
+#   tools/run-benchmarks            small/large threshold, CC and CFLAGS honoured
+#                                   (default cc, -O2, as CRAN builds)
+#
+# On x86-64 it also runs the benchmark built with -mavx2, to answer design D7
+# (whether an AVX2 copy with runtime dispatch is worth adding).
+set -eu
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+CC=${CC:-cc}
+CFLAGS=${CFLAGS:--O2}
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+build_run() {
+    label=$1; shift
+    # shellcheck disable=SC2086
+    $CC $CFLAGS "$@" -std=gnu99 -I"$ROOT/src/vendor/xsum" -o "$tmp/threshold" \
+        "$ROOT/tools/bench/threshold.c" "$ROOT/src/vendor/xsum/xsum.c" -lm
+    printf '### %s: %s %s %s (%s)\n\n' "$label" "$CC" "$CFLAGS" "$*" "$(uname -sm)"
+    "$tmp/threshold"
+    echo
+}
+
+build_run "baseline"
+case "$(uname -m)" in
+    x86_64|amd64|AMD64) build_run "avx2" -mavx2 ;;
+esac

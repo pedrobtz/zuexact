@@ -19,9 +19,11 @@ file: `CLAUDE.md` orients, the design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stage 0 (package identity). The package builds and loads
-with an empty routine table. No R function exists yet; xsum is not vendored
-yet (Stage 1).
+Verified 2026-10-13: Stages 0 and 1. xsum is vendored, patched and compiled
+into `zuexact.so`; upstream's checker and fuzzer pass against it on Linux,
+macOS and Windows. The only entry point is the internal `zxe_selftest()`
+(both accumulators over one vector). No exported R function exists yet
+(Stage 2).
 
 ## Stage tracking
 
@@ -58,7 +60,13 @@ Rscript -e 'devtools::test()'                    # full testthat suite
 Rscript -e 'devtools::test(shuffle = TRUE)'      # order independence
 Rscript -e 'devtools::check()'                   # R CMD check
 air format .                                     # format R sources
+tools/vendor/verify                              # vendored tree == upstream + patches
+tools/xsum-check/run [iters [seed]]              # upstream checker and fuzzer
+tools/run-benchmarks                             # small/large threshold (C, no R)
 ```
+
+The first five are the development loop; the `tools/` scripts are for
+vendoring changes and need `curl` and a C compiler.
 
 ## Invariants that are easy to break
 
@@ -118,15 +126,24 @@ close #2 and #12.
 Workflows call `pedrobtz/r-actions`: `R-CMD-check.yaml` (`r-cmd-check.yml@v1`,
 quick on pull requests, full on `main`, `nold: true`), `coverage.yaml`
 (`coverage.yml`, pinned to a commit because it holds a write token; badge on
-`gh-pages` because `main` takes no direct pushes). `pkgdown.yaml` deploys with
+`gh-pages` because `main` takes no direct pushes), `native-checks.yaml`
+(sanitizers, valgrind, LTO, gctorture, rchk, analyzers, CRAN special checks),
+`vendor.yaml`, `vendor-upstream.yaml` (weekly), and `xsum-check.yaml`
+(upstream's checker, fuzzer and the threshold benchmark on three OSes, outside
+R). `pkgdown.yaml` deploys with
 `force: false` so it does not overwrite the badge commit. The `full-ci` label
 runs the full profile on a pull request.
 
 ## Vendored native code
 
-From Stage 1: `xsum` by Radford M. Neal, MIT, pinned at commit `b766b3e`
-("stable version 3", 2024-11-13), in `src/vendor/xsum/`. Local patches live in
-`tools/patches/` and are listed in `src/vendor/PROVENANCE`. CRAN's
+`xsum` by Radford M. Neal, MIT, pinned at tag `stable-version-3`, commit
+`b766b3e` (2024-11-13), in `src/vendor/xsum/`. `tools/vendor/manifest.tsv`
+pins it; `tools/vendor/checksums.sha256` records the installed files; the one
+local patch is `tools/patches/xsum/0001-no-stdio-exact-only.patch`. Never edit
+`src/vendor/` by hand: change the patch and run `tools/vendor/fetch`. The
+`vendor.yaml` workflow rejects a pull request that changes the tree without
+the manifest and checksums, and `vendor-upstream.yaml` opens an issue weekly
+when upstream tags a newer stable version. CRAN's
 compiled-code check applies to vendored code: no `printf`, `abort`, `exit` or
 system RNG may be linked, even behind a debug switch. Remove them with a patch,
 never with a justification.

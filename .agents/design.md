@@ -356,34 +356,69 @@ typedef struct {
 
 ## 8. The vendored library, as zuexact uses it
 
-- `xsum.c` and `xsum.h` at the 2024-11-13 stable version, with `LICENSE`
-  into `inst/COPYRIGHTS`; `src/xsum/VERSION` records the commit and
-  SHA-256 per file.
+- `xsum.c`, `xsum.h` and `LICENSE` at the 2024-11-13 stable version
+  (`stable-version-3`, commit `b766b3e`) in `src/vendor/xsum/`; the MIT
+  notice is repeated in `inst/COPYRIGHTS`. `tools/vendor/manifest.tsv`
+  records the commit and the SHA-256 of each upstream file, and
+  `tools/vendor/checksums.sha256` the SHA-256 of each file as installed.
+  `tools/vendor/fetch` rebuilds the tree from upstream; `tools/vendor/verify`
+  checks that upstream at the pinned commit plus exactly the patches in
+  `tools/patches/xsum/` reproduces it (the layout r-actions' `vendor.yml`
+  expects).
 - **Compile-time options stay at upstream defaults.** `USE_SIMD` is `1`
   upstream, and every SIMD path is additionally guarded by `__SSE2__`
   (always defined on x86-64) or `__AVX__` (never defined under CRAN's
   baseline flags). So the build is already portable: SSE2 code on
   x86-64, scalar code on ARM64, nothing to switch off. Revision 1 planned
-  to set `USE_SIMD` to `0`; that would only slow x86-64. Stage 0 measures
+  to set `USE_SIMD` to `0`; that would only slow x86-64. Stage 1 measures
   whether an AVX2 copy with runtime dispatch (the same function compiled
   twice with `target` attributes) is worth adding; Neal's NEWS calls the
   SIMD gains "typically small".
-- **Patch, minimal and recorded as a diff in `src/xsum/PATCH`:** remove
-  `#include <stdio.h>`; remove `xsum_small_display()`,
-  `xsum_large_display()` and the `pbinary_*` stubs (they call `printf`
-  unconditionally, and are the only such calls that survive with `DEBUG`
-  undefined); drop the non-exact comparison routines (`xsum_sum_double`,
-  `xsum_sum_kahan`, `xsum_sum_float128`, the `_not_ordered` variants, and
-  the `OPT_SIMPLE_*`/`OPT_KAHAN_SUM` code) from the package build, keeping
-  them under `tools/bench/` for the benchmark harness. `string.h` stays:
-  the default `USE_MEMSET_*` paths need `memset()`. Nothing else changes.
-- **Threshold.** Neal's api-doc says the large accumulator wins "when
-  summing more than about 1,000 numbers at once"; Xsum.jl measured 256
-  as the crossover on its platform; the Rust crate uses 1,000. Stage 0
-  measures on the three CI platforms and records the chosen constant,
-  which `zuexact_info()` reports.
-- Upstream's `xsum-check.c` and the fuzzer are run in CI against the
-  vendored copy.
+- **One patch, `tools/patches/xsum/0001-no-stdio-exact-only.patch`.** The
+  `#include <stdio.h>` becomes conditional on `DEBUG`; without it, `printf`
+  and the two display routines are no-op macros, so the debug-only calls
+  (dead code under upstream's own `#define xsum_debug 0`) compile to
+  nothing at any optimisation level. The global `xsum_debug` variable
+  exists only under `DEBUG`. Everything after the exact routines is
+  removed: the non-exact comparison routines (`xsum_sum_double`,
+  `xsum_sum_kahan`, `xsum_sum_float128`, the `_not_ordered`, `sqnorm` and
+  `dot` variants) and the debugging routines (`xsum_*_display()`, which
+  call `printf` unconditionally, and `xsum_*_chunks_used()`), with their
+  declarations in `xsum.h`. `string.h` stays: the default `USE_MEMSET_*`
+  paths and `COPY64` need `memset()` and `memcpy()`. The result compiles
+  without warnings under `-Wall -Wextra -pedantic` and links only
+  `memcpy`, `memset` (and the stack protector); `test-abi.R` checks no
+  stdio symbol reaches `zuexact.so`.
+- **Threshold, measured 2026-10-13.** Neal's api-doc says the large
+  accumulator wins "when summing more than about 1,000 numbers at once";
+  Xsum.jl measured 256; the Rust crate uses 1,000. `tools/run-benchmarks`
+  (init, `addv` and round for each method, `-O2`, exponents spread over
+  2^±20) gave, on the CI runners:
+
+  | Platform | Crossover n | large / small at n = 128 | at n = 384 |
+  | --- | ---: | ---: | ---: |
+  | Linux x86-64, gcc | 192 | 1.04 | 0.54 |
+  | Windows x86-64, gcc (Rtools) | 96 | 0.77 | 0.38 |
+  | macOS ARM64, clang | 384 | 2.03 | 0.73 |
+
+  The constant is chosen per architecture at compile time, since it
+  changes speed and never the result: **384 on ARM64, 128 elsewhere**,
+  which keeps the worst slowdown on any measured platform near 30%. A
+  single constant cannot do better than about 1.5× somewhere. `zuexact_info()`
+  reports the value in use. At n = 10^6 the large accumulator costs
+  0.4–0.8 ns per element, the small one 3.7–5.8.
+- **AVX2 (D7), decided 2026-10-13: no.** The same benchmark built with
+  `-mavx2` is within noise of the baseline on both x86-64 runners (Linux
+  0.41 versus 0.41 ns per element at n = 10^6; Windows 0.70 versus 0.68),
+  because xsum's AVX code only touches carry propagation and the
+  initialisation paths that `USE_MEMSET_*` already replaces. No runtime
+  dispatch is added.
+- Upstream's `xsum-check.c` and its fuzzer run in CI against the vendored,
+  patched copy, compiled without `DEBUG` exactly as the package compiles
+  it (`tools/xsum-check/run`, workflow `xsum-check.yaml`, on Linux, macOS
+  and Windows). The test programs are fetched from upstream at the pinned
+  commit, not vendored; a two-function shim supplies the debug symbols
+  the checker references but never calls.
 
 ## 9. TwoProduct and FMA
 
