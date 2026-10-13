@@ -130,7 +130,9 @@ above: `src/vendor/xsum/` (not `src/xsum/`); `tools/vendor/manifest.tsv` and
 removed by the patch and not kept under `tools/bench/`: the benchmark needs
 only the exact routines. The full r-actions native-checks set (sanitizers,
 valgrind, LTO, gctorture, rchk, analyzers, CRAN special checks) is adopted
-instead of the sanitizers workflow alone. Scope is unchanged.
+instead of the sanitizers workflow alone. The threshold is per architecture (384 on ARM64, 128 elsewhere) rather
+than one constant, because one constant costs 1.5× on some platform (design
+§8). Scope is unchanged.
 
 **Exit criteria.**
 - `R CMD check` passes on every full-profile leg; the shared object

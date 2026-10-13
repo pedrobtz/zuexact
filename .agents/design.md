@@ -389,11 +389,30 @@ typedef struct {
   without warnings under `-Wall -Wextra -pedantic` and links only
   `memcpy`, `memset` (and the stack protector); `test-abi.R` checks no
   stdio symbol reaches `zuexact.so`.
-- **Threshold.** Neal's api-doc says the large accumulator wins "when
-  summing more than about 1,000 numbers at once"; Xsum.jl measured 256
-  as the crossover on its platform; the Rust crate uses 1,000. Stage 0
-  measures on the three CI platforms and records the chosen constant,
-  which `zuexact_info()` reports.
+- **Threshold, measured 2026-10-13.** Neal's api-doc says the large
+  accumulator wins "when summing more than about 1,000 numbers at once";
+  Xsum.jl measured 256; the Rust crate uses 1,000. `tools/run-benchmarks`
+  (init, `addv` and round for each method, `-O2`, exponents spread over
+  2^±20) gave, on the CI runners:
+
+  | Platform | Crossover n | large / small at n = 128 | at n = 384 |
+  | --- | ---: | ---: | ---: |
+  | Linux x86-64, gcc | 192 | 1.04 | 0.54 |
+  | Windows x86-64, gcc (Rtools) | 96 | 0.77 | 0.38 |
+  | macOS ARM64, clang | 384 | 2.03 | 0.73 |
+
+  The constant is chosen per architecture at compile time, since it
+  changes speed and never the result: **384 on ARM64, 128 elsewhere**,
+  which keeps the worst slowdown on any measured platform near 30%. A
+  single constant cannot do better than about 1.5× somewhere. `zuexact_info()`
+  reports the value in use. At n = 10^6 the large accumulator costs
+  0.4–0.8 ns per element, the small one 3.7–5.8.
+- **AVX2 (D7), decided 2026-10-13: no.** The same benchmark built with
+  `-mavx2` is within noise of the baseline on both x86-64 runners (Linux
+  0.41 versus 0.41 ns per element at n = 10^6; Windows 0.70 versus 0.68),
+  because xsum's AVX code only touches carry propagation and the
+  initialisation paths that `USE_MEMSET_*` already replaces. No runtime
+  dispatch is added.
 - Upstream's `xsum-check.c` and its fuzzer run in CI against the vendored,
   patched copy, compiled without `DEBUG` exactly as the package compiles
   it (`tools/xsum-check/run`, workflow `xsum-check.yaml`, on Linux, macOS
