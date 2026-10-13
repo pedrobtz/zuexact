@@ -1,14 +1,30 @@
 Package: zuexact
-Title: What the Package Does (One Line, Title Case)
+Title: Exactly Rounded Sums, Means and Dot Products
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: c(
+    person("Pedro", "Baltazar", , "pedrobtz@gmail.com",
+           role = c("aut", "cre", "cph")),
+    person("Radford M.", "Neal", role = "cph",
+           comment = "Author of the vendored 'xsum' library")
+  )
+Description: Sums of double-precision numbers computed exactly and rounded
+    once, so the result is the correctly rounded true sum and does not depend
+    on the order of the elements, the platform, or whether R was built with
+    long doubles. Built on the small and large superaccumulators of Neal
+    (2015) <doi:10.48550/arXiv.1505.05571>. Provides exactly rounded sums,
+    means, cumulative sums, dot products and norms, row, column and grouped
+    sums, accumulators that can be built in pieces and merged across
+    processes, and a registered 'C' interface for other packages.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 8.1.0
+URL: https://pedrobtz.github.io/zuexact/, https://github.com/pedrobtz/zuexact
+BugReports: https://github.com/pedrobtz/zuexact/issues
+Depends: 
+    R (>= 4.1)
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-URL: https://pedrobtz.github.io/zuexact/
+Encoding: UTF-8
+Language: en-GB
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.0
+SystemRequirements: C99

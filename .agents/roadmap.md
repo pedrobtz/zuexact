@@ -2,9 +2,9 @@
 
 Status: draft 2026-10-13. Implements [design.md](design.md) (RFC 0023,
 revision 2). Target: v0.1.0, the first CRAN release.
-Tracking: [v0.1.0 (#?)](https://github.com/pedrobtz/zuexact/issues), with
+Tracking: [v0.1.0 (#2)](https://github.com/pedrobtz/zuexact/issues/2), with
 one sub-issue per stage;
-[CRAN-submission (#?)](https://github.com/pedrobtz/zuexact/issues).
+[CRAN-submission (#12)](https://github.com/pedrobtz/zuexact/issues/12).
 
 Starting point, 2026-10-13: the `usethis` skeleton. `DESCRIPTION` carries
 placeholder title, description and author; `src/zuexact.c` is two includes;
@@ -24,19 +24,20 @@ before the C table (Stage 6) because the table operates on the same bytes.
 
 | Stage | Title | Issue | Pull request | Done |
 | --- | --- | --- | --- | --- |
-| 0 | [Package identity](#stage-0--package-identity) | #? | | |
-| 1 | [Vendor, patch and measure xsum](#stage-1--vendor-patch-and-measure-xsum) | #? | | |
-| 2 | [Exact sums and special values](#stage-2--exact-sums-and-special-values) | #? | | |
-| 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | #? | | |
-| 4 | [Accumulator values](#stage-4--accumulator-values) | #? | | |
-| 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | #? | | |
-| 6 | [The C table](#stage-6--the-c-table) | #? | | |
-| 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | #? | | |
-| 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | #? | | |
+| 0 | [Package identity](#stage-0--package-identity) | [#3](https://github.com/pedrobtz/zuexact/issues/3) | | 2026-10-13 |
+| 1 | [Vendor, patch and measure xsum](#stage-1--vendor-patch-and-measure-xsum) | [#4](https://github.com/pedrobtz/zuexact/issues/4) | | |
+| 2 | [Exact sums and special values](#stage-2--exact-sums-and-special-values) | [#5](https://github.com/pedrobtz/zuexact/issues/5) | | |
+| 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | | |
+| 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | | |
+| 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | | |
+| 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | | |
+| 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | | |
+| 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | | |
 
 ## Stage 0 — Package identity
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#3](https://github.com/pedrobtz/zuexact/issues/3), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** The repository says what the package is, by whom, under which
 licence and R floor, and its check workflow runs the one CI leg that
@@ -83,7 +84,8 @@ workflows call `pedrobtz/r-actions` by `@v1`; `LICENSE.md` exists;
 
 ## Stage 1 — Vendor, patch and measure xsum
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#4](https://github.com/pedrobtz/zuexact/issues/4), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** Neal's xsum compiles inside the package on every CI platform
 under CRAN's flags, with no stdio symbol, verified by upstream's own
@@ -132,7 +134,8 @@ measured and written down. No R function yet.
 
 ## Stage 2 — Exact sums and special values
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#5](https://github.com/pedrobtz/zuexact/issues/5), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** `xsum()` returns the correctly rounded sum of double, integer,
 logical and complex vectors, with `na.rm`, applying the special-value
@@ -178,7 +181,8 @@ in blocks, in one pass.
 
 ## Stage 3 — Means, cumulative sums, dot products and norms
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#6](https://github.com/pedrobtz/zuexact/issues/6), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** `xsum_mean()`, `xsum_cumsum()`, `xsum_dot()`, `xsum_sqnorm()`,
 `xsum_norm()` and `xsum_weighted_mean()` exist, each with its rounding
@@ -218,7 +222,8 @@ fused by any compiler the package meets.
 
 ## Stage 4 — Accumulator values
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#7](https://github.com/pedrobtz/zuexact/issues/7), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** Sums can be built in pieces and merged, including across
 processes: `xsum_acc` is a serialisable R value, and an accumulator made on
@@ -258,7 +263,8 @@ of design.md.
 
 ## Stage 5 — Matrices and grouped sums
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#8](https://github.com/pedrobtz/zuexact/issues/8), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** `xsum_rowsums()`, `xsum_colsums()` and `xsum_by()` return
 exactly rounded sums with the shapes of `rowSums()`, `colSums()` and
@@ -290,7 +296,8 @@ exactly rounded sums with the shapes of `rowSums()`, `colSums()` and
 
 ## Stage 6 — The C table
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#9](https://github.com/pedrobtz/zuexact/issues/9), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** Another package's C code sums exactly through
 `R_GetCCallable("zuexact", "zuexact_api_v1")` with an opaque accumulator
@@ -323,7 +330,8 @@ it allocates itself, and a fixture package proves it in CI.
 
 ## Stage 7 — Oracles, adversarial inputs and cross-platform identity
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#10](https://github.com/pedrobtz/zuexact/issues/10), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** Every result is proven correctly rounded against exact rational
 arithmetic and an independent exact implementation, on random, ill-
@@ -374,7 +382,8 @@ the performance targets are measured and recorded.
 
 ## Stage 8 — v0.1.0 readiness
 
-**Issue.** #?, sub-issue of v0.1.0 (#?).
+**Issue.** [#11](https://github.com/pedrobtz/zuexact/issues/11), sub-issue of
+[v0.1.0](https://github.com/pedrobtz/zuexact/issues/2).
 
 **Goal.** Only the submission itself is left.
 
