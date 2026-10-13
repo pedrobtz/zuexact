@@ -462,6 +462,14 @@ parser reads that literal differently on builds without long doubles.
   numbers final; the RFC copy in `pedrobtz/packages` synced to this
   design.
 
+**Review, 2026-10-13.** The `pkg-cran-review` skill was run on this
+branch. `R CMD check --as-cran` with remote checks gave two NOTEs: "New
+submission" and a local HTML Tidy too old to validate the manual (an
+environment limitation, not the package). Two findings were fixed:
+`cran-comments.md` claimed a NOSUGGESTS check that CI does not run, and the
+README lacked the CRAN install line. `urlchecker::url_check()` and
+`spelling::spell_check_package()` are clean.
+
 **Exit criteria.**
 - A full-profile r-actions run is green on the release commit, including
   `nold`, `nosuggests`, the sanitizers and the fixture package.
