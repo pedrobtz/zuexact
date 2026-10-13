@@ -22,10 +22,10 @@ file: `CLAUDE.md` orients, the design decides.
 Verified 2026-10-13: Stages 0 to 4. Exported: `xsum()`, `xsum_mean()`,
 `xsum_weighted_mean()`, `xsum_cumsum()`, `xsum_dot()`, `xsum_sqnorm()`,
 `xsum_norm()`, the accumulator values (`xsum_acc()`, `xsum_add()`,
-`xsum_merge()`, `xsum_negate()`, `xsum_value()`, `xsum_mean_value()`) and
-`zuexact_info()`. xsum is vendored, patched, and checked by upstream's own
-checker and fuzzer. Matrices, grouped sums and the C table are not built yet
-(Stages 5 and 6).
+`xsum_merge()`, `xsum_negate()`, `xsum_value()`, `xsum_mean_value()`),
+`xsum_rowsums()`, `xsum_colsums()`, `xsum_by()` and `zuexact_info()`. xsum is
+vendored, patched, and checked by upstream's own checker and fuzzer. The C
+table for other packages is not built yet (Stage 6).
 
 ## Stage tracking
 
@@ -65,6 +65,7 @@ air format .                                     # format R sources
 tools/vendor/verify                              # vendored tree == upstream + patches
 tools/xsum-check/run [iters [seed]]              # upstream checker and fuzzer
 tools/run-benchmarks                             # small/large threshold (C, no R)
+Rscript -e 'devtools::load_all(); source("tools/bench/matrix.R")'  # matrix timings
 ```
 
 The first five are the development loop; the `tools/` scripts are for
@@ -110,6 +111,7 @@ vendoring changes and need `curl` and a C compiler.
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads the
   shared object's exported and undefined symbols with `nm`; `helper-vendor.R`
   defines `selftest()`, which sums through both xsum accumulators directly;
+  `helper-data.R` makes random matrices spread over 80 binades;
   `helper-oracle.R` holds the exact rational oracle (`exact_sum()`,
   `exact_dot()`), whose `round_bigq()` exists because gmp's `as.double()`
   truncates instead of rounding.

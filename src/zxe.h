@@ -32,5 +32,8 @@ SEXP zxe_acc_add(SEXP acc, SEXP x, SEXP narm);
 SEXP zxe_acc_merge(SEXP acc, SEXP other);
 SEXP zxe_acc_negate(SEXP acc);
 SEXP zxe_acc_value(SEXP acc, SEXP n);
+SEXP zxe_colsums(SEXP x, SEXP nrow, SEXP ncol, SEXP narm);
+SEXP zxe_rowsums(SEXP x, SEXP nrow, SEXP ncol, SEXP narm);
+SEXP zxe_by(SEXP x, SEXP nrow, SEXP ncol, SEXP code, SEXP ng, SEXP narm);
 
 #endif

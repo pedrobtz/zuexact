@@ -247,10 +247,20 @@ rescan for R's special values (§6): NA vs NaN vs Inf; decide the result
   binding).
 - **Row sums over column-major storage.** One accumulator per row would
   cost 560 bytes × `nrow`, so `xsum_rowsums()` processes rows in blocks
-  (a block of 1,024 rows is 560 KB of accumulators) and walks each
-  column's slice of the block. `xsum_by()` keys one accumulator per
-  group; above a group count that Stage 3 measures, it orders the rows by
-  group and sums contiguous runs instead.
+  of 1,024 (560 KB of accumulators) and walks each column's slice of the
+  block. A 1e7 × 3 matrix needs under 10 MB beyond its result
+  (`test-matrix.R`). Measured 2026-10-13 on macOS ARM64, 1e6 × 10
+  doubles: `xsum_rowsums()` 0.26 s, `xsum_colsums()` 0.06 s (`rowSums()`
+  0.003 s, `colSums()` 0.009 s). Row sums are dominated by initialising
+  and rounding one accumulator per row, about 250 ns a row; column sums are
+  long vectors and use the large accumulator. `xsum_by()` keeps one
+  accumulator per group and column while there are at most 16,384 such
+  cells (9 MB), in one pass; above that it counting-sorts the rows by
+  group and sums each group's run as one vector. On 1e6 doubles it takes
+  0.026 s with 10 or 1,000 groups, 0.048 and 0.050 s either side of the
+  switch, 0.115 s with 1e5 groups and 0.156 s with 1e6 (`rowsum()`: 0.010,
+  0.009, 0.030, 0.030, 0.088 and 0.072 s). `tools/bench/matrix.R`
+  reproduces these.
 - **Cumulative sums** round after every element; a round scans the
   chunks, so `xsum_cumsum()` is O(n × chunks) and is documented as the
   slowest function in the package (§12).

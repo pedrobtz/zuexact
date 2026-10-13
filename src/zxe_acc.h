@@ -44,4 +44,28 @@ static inline double zxe_acc_div(zxe_acc *a, unsigned n) {
                   : xsum_small_div_unsigned(&a->sacc, n);
 }
 
+
+/* Special values seen, and the rules of design §6 applied to them. */
+enum { ZXE_F_NA = 1, ZXE_F_NAN = 2, ZXE_F_PINF = 4, ZXE_F_NINF = 8 };
+
+static inline unsigned char zxe_flag_of(double d) {
+  if (ISNAN(d)) return R_IsNA(d) ? ZXE_F_NA : ZXE_F_NAN;
+  if (d == R_PosInf) return ZXE_F_PINF;
+  if (d == R_NegInf) return ZXE_F_NINF;
+  return 0;
+}
+
+/* r is xsum's rounded value; *internal is set if xsum holds a NaN that no
+   flag explains (accumulator overflow). */
+static inline double zxe_apply_flags(unsigned char f, double r, int *internal) {
+  if (f & ZXE_F_NA) return NA_REAL;
+  if (f & ZXE_F_NAN) return R_NaN;
+  if ((f & ZXE_F_PINF) && (f & ZXE_F_NINF)) return R_NaN;
+  if (ISNAN(r)) {
+    *internal = 1;
+    return R_NaN;
+  }
+  return r;
+}
+
 #endif
