@@ -1,8 +1,8 @@
 zuexact is Copyright (c) 2026 Pedro Baltazar, under the MIT licence in
 LICENSE.
 
-From Stage 1 of the roadmap, zuexact includes the 'xsum' library by
-Radford M. Neal, https://github.com/radfordneal/xsum, in src/vendor/xsum/:
+zuexact includes the 'xsum' library by Radford M. Neal,
+https://github.com/radfordneal/xsum, in src/vendor/xsum/:
 
   Copyright 2015, 2018, 2021, 2024 Radford M. Neal
 
