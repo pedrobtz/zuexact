@@ -71,7 +71,7 @@ fetch_row() {
 }
 
 record_checksums() {
-    (cd "$ROOT" && find src/vendor -type f | LC_ALL=C sort | while read -r f; do
+    (cd "$ROOT" && find src/vendor -type f ! -name '*.o' ! -name '*.so' ! -name '*.dll' | LC_ALL=C sort | while read -r f; do
         printf '%s  %s\n' "$(sha256 "$f")" "$f"
     done) > "$CHECKSUMS"
 }

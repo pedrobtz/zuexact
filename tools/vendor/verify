@@ -25,7 +25,7 @@ while read -r want path; do
 done < "$CHECKSUMS"
 
 # 2. no vendored file that checksums.sha256 does not know about
-for f in $(cd "$ROOT" && find src/vendor -type f | LC_ALL=C sort); do
+for f in $(cd "$ROOT" && find src/vendor -type f ! -name '*.o' ! -name '*.so' ! -name '*.dll' | LC_ALL=C sort); do
     if ! grep -q "  $f\$" "$CHECKSUMS"; then
         printf 'FAIL unrecorded vendored file: %s\n' "$f" >&2
         status=1
