@@ -9,6 +9,11 @@ static const R_CallMethodDef call_methods[] = {
   {"zxe_mean", (DL_FUNC) &zxe_mean, 2},
   {"zxe_dot", (DL_FUNC) &zxe_dot, 2},
   {"zxe_cumsum", (DL_FUNC) &zxe_cumsum, 1},
+  {"zxe_acc_new", (DL_FUNC) &zxe_acc_new, 0},
+  {"zxe_acc_add", (DL_FUNC) &zxe_acc_add, 3},
+  {"zxe_acc_merge", (DL_FUNC) &zxe_acc_merge, 2},
+  {"zxe_acc_negate", (DL_FUNC) &zxe_acc_negate, 1},
+  {"zxe_acc_value", (DL_FUNC) &zxe_acc_value, 2},
   {NULL, NULL, 0}
 };
 

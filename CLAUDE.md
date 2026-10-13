@@ -19,11 +19,13 @@ file: `CLAUDE.md` orients, the design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 to 3. Exported: `xsum()`, `xsum_mean()`,
+Verified 2026-10-13: Stages 0 to 4. Exported: `xsum()`, `xsum_mean()`,
 `xsum_weighted_mean()`, `xsum_cumsum()`, `xsum_dot()`, `xsum_sqnorm()`,
-`xsum_norm()`, `zuexact_info()`. xsum is vendored, patched, and checked by
-upstream's own checker and fuzzer. Accumulator values, matrices, grouped sums
-and the C table are not built yet (Stages 4 to 6).
+`xsum_norm()`, the accumulator values (`xsum_acc()`, `xsum_add()`,
+`xsum_merge()`, `xsum_negate()`, `xsum_value()`, `xsum_mean_value()`) and
+`zuexact_info()`. xsum is vendored, patched, and checked by upstream's own
+checker and fuzzer. Matrices, grouped sums and the C table are not built yet
+(Stages 5 and 6).
 
 ## Stage tracking
 
@@ -74,6 +76,12 @@ vendoring changes and need `curl` and a C compiler.
   (`src/zxe_sum.c`). The rescan must skip exactly what `na.rm = TRUE`
   removed, including a complex element dropped because its *other* part is
   `NaN`; it once did not, and `xsum(c(NA, Inf), na.rm = TRUE)` gave `NA`.
+- **An `xsum_acc` is 568 raw bytes**: an 8-byte header (magic `ZXAC`, layout
+  version, byte order, special-value flags) and one xsum small accumulator
+  (`src/zxe_accval.c`). R's `NA`/`NaN` distinction lives in the header flags,
+  because xsum keeps a single NaN by payload. Changing the layout means
+  bumping the version byte; the C table (Stage 6) operates on the same bytes.
+  Locals are zeroed before use so no uninitialised padding is serialised.
 - **`ALTREP()` decides how a vector is read.** ALTREP vectors go through
   `*_GET_REGION` into a stack block; `REAL_RO()` on one would materialise it.
 
