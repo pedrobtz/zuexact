@@ -27,7 +27,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 0 | [Package identity](#stage-0--package-identity) | [#3](https://github.com/pedrobtz/zuexact/issues/3) | [#13](https://github.com/pedrobtz/zuexact/pull/13) | 2026-10-13 |
 | 1 | [Vendor, patch and measure xsum](#stage-1--vendor-patch-and-measure-xsum) | [#4](https://github.com/pedrobtz/zuexact/issues/4) | [#14](https://github.com/pedrobtz/zuexact/pull/14) | 2026-10-13 |
 | 2 | [Exact sums and special values](#stage-2--exact-sums-and-special-values) | [#5](https://github.com/pedrobtz/zuexact/issues/5) | [#15](https://github.com/pedrobtz/zuexact/pull/15) | 2026-10-13 |
-| 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | | |
+| 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | | 2026-10-13 |
 | 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | | |
 | 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | | |
 | 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | | |
@@ -225,6 +225,13 @@ fused by any compiler the package meets.
   purpose, with the result compared to a high-precision oracle; product
   overflow giving `±Inf`; `xsum_mean(c(1e15, -1e15, 0.1))` equal to
   `0.1 / 3` correctly rounded (Neal's R example).
+
+**Deviation, 2026-10-13.** `-ffp-contract=off` is not added to
+`PKG_CFLAGS`: R CMD check reports any `-f` flag there as non-portable (a
+NOTE). The pragma, separate statements and the canary in `test-dot.R` guard
+TwoProduct instead (design §13). The rational oracle needed a correctly
+rounding conversion (`helper-oracle.R`): gmp's `as.double()` on a `bigq`
+truncates. `gmp` joins Suggests here rather than in Stage 7.
 
 **Exit criteria.**
 - The TwoProduct canary passes on every full-profile leg, including the

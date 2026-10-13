@@ -21,6 +21,7 @@ BugReports: https://github.com/pedrobtz/zuexact/issues
 Depends: 
     R (>= 4.1)
 Suggests: 
+    gmp,
     testthat (>= 3.0.0),
     withr
 Config/testthat/edition: 3
