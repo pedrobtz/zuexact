@@ -416,7 +416,12 @@ the vendored library and the accumulator operations zuexact builds on
 the R entry points are covered by the oracle and special-value suites, and
 `zufuzz` is not used. Benchmarks of the R functions are
 `tools/bench/functions.R`. `R_FINITE()` was replaced by C99 `isfinite()`
-in the hot loops: outside R itself it is a function call.
+in the hot loops: outside R itself it is a function call. The
+ill-conditioned dot-product oracle failed on Windows, because the mingw-w64
+`fma()` is not exact; TwoProduct now uses `fma()` only with hardware FMA
+and Dekker's splitting otherwise (`src/zxe_twoprod.h`, design §9). The bits
+fixture's `1e308` input is built from its bit pattern, because R's decimal
+parser reads that literal differently on builds without long doubles.
 
 **Exit criteria.**
 - The rational oracle and `PreciseSums::fsum()` agree with every zuexact

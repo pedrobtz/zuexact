@@ -115,8 +115,12 @@ vendoring changes and need `curl` and a C compiler.
   the end and let `struct_size` tell consumers; any other change is a new
   name, `zuexact_api_v2`. `tools/zuexacttest` is the consumer that proves it
   (`consumer.yaml`).
+- **Never trust a software `fma()`.** mingw-w64's (Windows, Rtools) gave
+  wrong error terms. `src/zxe_twoprod.h` uses `fma()` only under
+  `FP_FAST_FMA` and Dekker's splitting otherwise; define `ZXE_NO_FMA` to
+  test the Dekker branch on a machine with hardware FMA.
 - **TwoProduct must not be contracted** (design §9, §13). The files that
-  split products with `fma()` (`zxe_dot.c`, `zxe_api.c`) carry
+  include `zxe_twoprod.h` (`zxe_dot.c`, `zxe_api.c`) carry
   `#pragma STDC FP_CONTRACT OFF` and keep `p = x*y` and
   `e = fma(x, y, -p)` in separate statements. `-ffp-contract=off` cannot be
   used: R CMD check reports `-f` flags as non-portable.

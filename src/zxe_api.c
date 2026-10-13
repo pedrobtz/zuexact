@@ -4,6 +4,7 @@
 
 #include "zxe.h"
 #include "../inst/include/zuexact.h"
+#include "zxe_twoprod.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,19 +40,14 @@ static void api_addv(void *acc, const double *x, ptrdiff_t n) {
   xsum_small_addv(s, x, (xsum_length) n);
 }
 
-/* TwoProduct, as in zxe_dot.c: p and e as separate statements, contraction
-   off, a non-finite product contributing only itself. */
+/* TwoProduct, as in zxe_dot.c (zxe_twoprod.h). */
 static void api_add_dot(void *acc, const double *x, const double *y,
                         ptrdiff_t n) {
   double p[ZXE_API_BLOCK], e[ZXE_API_BLOCK];
   for (ptrdiff_t i = 0; i < n; i += ZXE_API_BLOCK) {
     ptrdiff_t m = n - i < ZXE_API_BLOCK ? n - i : ZXE_API_BLOCK;
     for (ptrdiff_t j = 0; j < m; j++) {
-      double xj = x[i + j], yj = y[i + j];
-      double pj = xj * yj;
-      double ej = fma(xj, yj, -pj);
-      p[j] = pj;
-      e[j] = isfinite(pj) ? ej : 0.0;
+      zxe_two_prod(x[i + j], y[i + j], &p[j], &e[j]);
     }
     api_addv(acc, p, m);
     api_addv(acc, e, m);

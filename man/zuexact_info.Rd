@@ -17,8 +17,9 @@ choice affects speed only, never the result.
 \item \code{simd}: the SIMD instructions xsum was compiled to use: \code{"avx"},
 \code{"sse2"} or \code{"none"}.
 \item \code{fma_hardware}: whether the compiler reported a hardware fused
-multiply-add. Dot products are exact either way; a software \code{fma()} is
-slower.
+multiply-add. Dot products are exact either way: with it, each product's
+error comes from \code{fma()}; without it, from Dekker's splitting algorithm,
+because some C libraries' software \code{fma()} is not exact.
 \item \code{long_double}: whether this R has long doubles, which is what makes
 base \code{\link[=sum]{sum()}} differ between platforms.
 }

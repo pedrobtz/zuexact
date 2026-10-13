@@ -18,7 +18,7 @@ SEXP zxe_info(void) {
 #else
   SET_VECTOR_ELT(out, 3, Rf_mkString("none"));
 #endif
-#ifdef FP_FAST_FMA
+#if defined(FP_FAST_FMA) && !defined(ZXE_NO_FMA)
   SET_VECTOR_ELT(out, 4, Rf_ScalarLogical(TRUE));
 #else
   SET_VECTOR_ELT(out, 4, Rf_ScalarLogical(FALSE));
