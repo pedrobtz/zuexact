@@ -43,7 +43,7 @@
 </div>
 <div class="section level2">
 <h2 id="current-state">Current state<a class="anchor" aria-label="anchor" href="#current-state"></a></h2>
-<p>Verified 2026-10-13: Stage 0 (package identity). The package builds and loads with an empty routine table. No R function exists yet; xsum is not vendored yet (Stage 1).</p>
+<p>Verified 2026-10-13: Stages 0 and 1. xsum is vendored, patched and compiled into <code>zuexact.so</code>; upstream’s checker and fuzzer pass against it on Linux, macOS and Windows. The only entry point is the internal <code>zxe_selftest()</code> (both accumulators over one vector). No exported R function exists yet (Stage 2).</p>
 </div>
 <div class="section level2">
 <h2 id="stage-tracking">Stage tracking<a class="anchor" aria-label="anchor" href="#stage-tracking"></a></h2>
@@ -69,7 +69,11 @@
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'devtools::test()'</span>                    <span class="co"># full testthat suite</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'devtools::test(shuffle = TRUE)'</span>      <span class="co"># order independence</span></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">'devtools::check()'</span>                   <span class="co"># R CMD check</span></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="ex">air</span> format .                                     <span class="co"># format R sources</span></span></code></pre></div>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="ex">air</span> format .                                     <span class="co"># format R sources</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="ex">tools/vendor/verify</span>                              <span class="co"># vendored tree == upstream + patches</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="ex">tools/xsum-check/run</span> [iters <span class="pp">[</span><span class="ss">seed</span><span class="pp">]</span>]              <span class="co"># upstream checker and fuzzer</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="ex">tools/run-benchmarks</span>                             <span class="co"># small/large threshold (C, no R)</span></span></code></pre></div>
+<p>The first five are the development loop; the <code>tools/</code> scripts are for vendoring changes and need <code>curl</code> and a C compiler.</p>
 </div>
 <div class="section level2">
 <h2 id="invariants-that-are-easy-to-break">Invariants that are easy to break<a class="anchor" aria-label="anchor" href="#invariants-that-are-easy-to-break"></a></h2>
@@ -111,11 +115,11 @@
 </ul></div>
 <div class="section level2">
 <h2 id="continuous-integration">Continuous integration<a class="anchor" aria-label="anchor" href="#continuous-integration"></a></h2>
-<p>Workflows call <code>pedrobtz/r-actions</code>: <code>R-CMD-check.yaml</code> (<code>r-cmd-check.yml@v1</code>, quick on pull requests, full on <code>main</code>, <code>nold: true</code>), <code>coverage.yaml</code> (<code>coverage.yml</code>, pinned to a commit because it holds a write token; badge on <code>gh-pages</code> because <code>main</code> takes no direct pushes). <code>pkgdown.yaml</code> deploys with <code>force: false</code> so it does not overwrite the badge commit. The <code>full-ci</code> label runs the full profile on a pull request.</p>
+<p>Workflows call <code>pedrobtz/r-actions</code>: <code>R-CMD-check.yaml</code> (<code>r-cmd-check.yml@v1</code>, quick on pull requests, full on <code>main</code>, <code>nold: true</code>), <code>coverage.yaml</code> (<code>coverage.yml</code>, pinned to a commit because it holds a write token; badge on <code>gh-pages</code> because <code>main</code> takes no direct pushes), <code>native-checks.yaml</code> (sanitizers, valgrind, LTO, gctorture, rchk, analyzers, CRAN special checks), <code>vendor.yaml</code>, <code>vendor-upstream.yaml</code> (weekly), and <code>xsum-check.yaml</code> (upstream’s checker, fuzzer and the threshold benchmark on three OSes, outside R). <code>pkgdown.yaml</code> deploys with <code>force: false</code> so it does not overwrite the badge commit. The <code>full-ci</code> label runs the full profile on a pull request.</p>
 </div>
 <div class="section level2">
 <h2 id="vendored-native-code">Vendored native code<a class="anchor" aria-label="anchor" href="#vendored-native-code"></a></h2>
-<p>From Stage 1: <code>xsum</code> by Radford M. Neal, MIT, pinned at commit <code>b766b3e</code> (“stable version 3”, 2024-11-13), in <code>src/vendor/xsum/</code>. Local patches live in <code>tools/patches/</code> and are listed in <code>src/vendor/PROVENANCE</code>. CRAN’s compiled-code check applies to vendored code: no <code>printf</code>, <code>abort</code>, <code>exit</code> or system RNG may be linked, even behind a debug switch. Remove them with a patch, never with a justification.</p>
+<p><code>xsum</code> by Radford M. Neal, MIT, pinned at tag <code>stable-version-3</code>, commit <code>b766b3e</code> (2024-11-13), in <code>src/vendor/xsum/</code>. <code>tools/vendor/manifest.tsv</code> pins it; <code>tools/vendor/checksums.sha256</code> records the installed files; the one local patch is <code>tools/patches/xsum/0001-no-stdio-exact-only.patch</code>. Never edit <code>src/vendor/</code> by hand: change the patch and run <code>tools/vendor/fetch</code>. The <code>vendor.yaml</code> workflow rejects a pull request that changes the tree without the manifest and checksums, and <code>vendor-upstream.yaml</code> opens an issue weekly when upstream tags a newer stable version. CRAN’s compiled-code check applies to vendored code: no <code>printf</code>, <code>abort</code>, <code>exit</code> or system RNG may be linked, even behind a debug switch. Remove them with a patch, never with a justification.</p>
 </div>
 <div class="section level2">
 <h2 id="commits-and-pull-requests">Commits and pull requests<a class="anchor" aria-label="anchor" href="#commits-and-pull-requests"></a></h2>
