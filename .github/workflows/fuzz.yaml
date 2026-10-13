@@ -1,0 +1,24 @@
+# Design §11: coverage-guided fuzzing of the vendored xsum as zuexact uses
+# it (tools/fuzz/fuzz_xsum.c checks the accumulator invariants), compiled
+# without R, under ASan and UBSan. Short runs on pull requests, a long one
+# nightly; the corpus cache joins them into one campaign.
+on:
+  pull_request:
+  schedule:
+    - cron: "17 3 * * *"
+
+name: fuzz
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    uses: pedrobtz/r-actions/.github/workflows/fuzz.yml@v1
+    with:
+      harness: tools/fuzz/fuzz_xsum.c
+      sources: src/vendor/xsum/xsum.c
+      cflags: -g -O1 -fno-omit-frame-pointer -Isrc/vendor/xsum
+      seed-corpus: tools/fuzz/corpus
+      max-total-time: ${{ github.event_name == 'schedule' && 1800 || 120 }}

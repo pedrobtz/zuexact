@@ -32,7 +32,7 @@ static void add_products(zxe_acc *a, const double *x, const double *y,
       double pj = xj * yj;
       double ej = fma(xj, yj, -pj);
       p[j] = pj;
-      e[j] = R_FINITE(pj) ? ej : 0.0;
+      e[j] = isfinite(pj) ? ej : 0.0;
     }
     zxe_acc_addv(a, p, m);
     zxe_acc_addv(a, e, m);
@@ -73,7 +73,7 @@ SEXP zxe_dot(SEXP x, SEXP y) {
   zxe_acc_init(&acc, 2 * n);
   add_products(&acc, px, py, n);
   double r = zxe_acc_round(&acc);
-  if (!R_FINITE(r)) {
+  if (!isfinite(r)) {
     dot_flags f = {0, 0, 0, 0};
     for (R_xlen_t i = 0; i < n; i++) {
       if (R_IsNA(px[i]) || R_IsNA(py[i])) {

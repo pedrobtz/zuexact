@@ -523,18 +523,28 @@ Every condition inherits `zuexact_error`:
 
 ## 12. Performance targets
 
-Measured by `tools/run-benchmarks` and recorded in the design:
+Targets, and what was measured on 2026-10-13 (macOS ARM64, R 4.6.1, the
+installed package built at `-O2`; `tools/bench/functions.R`, median of
+seven runs on 1e7 doubles unless stated):
 
-- For `n >= 10^6`, `xsum()` within 3× of base `sum()`. Note that base
-  `sum()` on x86-64 runs x87 `long double` arithmetic, which is slow, so
-  the honest second baseline is a plain `double` loop; both are recorded.
-- `xsum_dot()` within 4× of `crossprod()` on vectors (BLAS) for
-  `n >= 10^6`; AccurateArithmetic.jl's SIMD `dot_oro` is the reference
-  for what a compensated (not exact) product costs.
-- A streaming merge costs one accumulator addition (67 chunk adds) plus
-  a 560-byte copy.
-- `xsum_cumsum()` is recorded, not targeted: a round per element makes it
-  the slowest function, and the documentation says so.
+| Operation | Target | Measured | Baseline |
+| --- | --- | ---: | ---: |
+| `xsum()` | within 3× of `sum()` | 0.024 s (1.5×) | `sum()` 0.016 s |
+| `xsum_mean()` | — | 0.023 s | `mean()` 0.019 s |
+| `xsum_dot()` | within 4× of `crossprod()` | 0.049 s (2.5×) | `crossprod()` 0.020 s |
+| `xsum_merge()`, one call | one accumulator addition | 4 µs, mostly R call overhead | — |
+| `xsum_cumsum()`, 1e6 | recorded, not targeted | 0.073 s | `cumsum()` 0.001 s |
+
+- A plain double loop in byte-compiled R takes 0.167 s on the same data, so
+  the honest "plain double" baseline is base `sum()` itself on this
+  platform, where `long double` is `double`. On x86-64, base `sum()` runs
+  x87 arithmetic and is slower, which only flatters `xsum()`.
+- `xsum_dot()` costs a product split (`p = x*y`, `e = fma(x, y, -p)`) and
+  twice as many terms; in C alone the split and both additions take 17 ms
+  on 1e7 pairs, so the rest is memory traffic through R's vectors.
+- Measure from an installed package: `devtools::load_all()` compiles at
+  `-O0`, which doubled `xsum_dot()`'s time when first measured.
+- Row, column and grouped sums are measured in §4.
 
 ## 13. Build, portability and CRAN
 
