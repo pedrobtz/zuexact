@@ -63,3 +63,8 @@ Development version of the first release, 0.1.0. This heading becomes
   `inst/include/zuexact.h`, gives other packages’ C code the same exact
   accumulators, sums, dot products, merges and means, through
   `LinkingTo: zuexact`.
+
+- Every result is tested against exact rational arithmetic (‘gmp’),
+  [`PreciseSums::fsum()`](https://rdrr.io/pkg/PreciseSums/man/fsum.html),
+  the test262 `Math.sumPrecise` vectors and ill-conditioned inputs up to
+  condition number 1e40, and must be bit-identical on every CI platform.

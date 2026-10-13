@@ -24,8 +24,10 @@ A list with elements:
   `"sse2"` or `"none"`.
 
 - `fma_hardware`: whether the compiler reported a hardware fused
-  multiply-add. Dot products are exact either way; a software `fma()` is
-  slower.
+  multiply-add. Dot products are exact either way: with it, each
+  product's error comes from `fma()`; without it, from Dekker's
+  splitting algorithm, because some C libraries' software `fma()` is not
+  exact.
 
 - `long_double`: whether this R has long doubles, which is what makes
   base [`sum()`](https://rdrr.io/r/base/sum.html) differ between

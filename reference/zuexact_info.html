@@ -52,8 +52,9 @@ choice affects speed only, never the result.</p></li>
 <li><p><code>simd</code>: the SIMD instructions xsum was compiled to use: <code>"avx"</code>,
 <code>"sse2"</code> or <code>"none"</code>.</p></li>
 <li><p><code>fma_hardware</code>: whether the compiler reported a hardware fused
-multiply-add. Dot products are exact either way; a software <code>fma()</code> is
-slower.</p></li>
+multiply-add. Dot products are exact either way: with it, each product's
+error comes from <code>fma()</code>; without it, from Dekker's splitting algorithm,
+because some C libraries' software <code>fma()</code> is not exact.</p></li>
 <li><p><code>long_double</code>: whether this R has long doubles, which is what makes
 base <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum()</a></code> differ between platforms.</p></li>
 </ul></div>
