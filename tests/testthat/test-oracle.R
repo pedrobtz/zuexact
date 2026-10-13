@@ -20,7 +20,7 @@ test_that("the test262 Math.sumPrecise vectors pass, -0 rows as +0 (D10)", {
 test_that("random sums equal the rational oracle", {
   skip_if_not_installed("gmp")
   withr::local_seed(30)
-  reps <- if (slow_tests()) 400 else 40
+  reps <- sweep_reps(40, 400)
   for (i in seq_len(reps)) {
     n <- sample(c(1:20, 100, 1000), 1)
     x <- (2 * stats::runif(n) - 1) * 2^sample(-1000:1000, n, TRUE)
@@ -31,7 +31,7 @@ test_that("random sums equal the rational oracle", {
 test_that("random sums agree with PreciseSums::fsum()", {
   skip_if_not_installed("PreciseSums")
   withr::local_seed(31)
-  reps <- if (slow_tests()) 20000 else 500
+  reps <- sweep_reps(500, 20000)
   for (i in seq_len(reps)) {
     n <- sample(1:50, 1)
     # Exponents kept clear of overflow: fsum's intermediate sums must stay
@@ -70,7 +70,7 @@ test_that("ill-conditioned dot products are exact (cond 1e8 to 1e40)", {
 test_that("means and differences equal the rational oracle", {
   skip_if_not_installed("gmp")
   withr::local_seed(34)
-  for (i in 1:30) {
+  for (i in seq_len(sweep_reps(30, 300))) {
     n <- sample(1:200, 1)
     x <- (2 * stats::runif(n) - 1) * 2^sample(-500:500, n, TRUE)
     expect_identical(
@@ -88,7 +88,7 @@ test_that("results do not depend on element order (50 permutations)", {
   )
   for (x in cases) {
     ref <- xsum(x)
-    for (i in 1:50) {
+    for (i in seq_len(sweep_reps(50, 500))) {
       expect_identical(xsum(x[sample.int(length(x))]), ref)
     }
   }

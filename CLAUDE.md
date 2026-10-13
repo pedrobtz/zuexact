@@ -137,7 +137,9 @@ vendoring changes and need `curl` and a C compiler.
   `gmp` (`helper-oracle.R`), `PreciseSums::fsum()`, the `Math.sumPrecise`
   test262 vectors (`fixtures/sumprecise/`, as bit patterns), and the
   Ogita–Rump–Oishi ill-conditioned generators (`helper-illcond.R`).
-  `ZUEXACT_SLOW_TESTS=true` widens every sweep (family rule R7).
+  `ZUEXACT_SLOW_TESTS=true` widens every sweep and `ZUEXACT_SKIP_HEAVY=true`
+  (set by the gctorture leg) shrinks it to two inputs (family rule R7,
+  `sweep_reps()` in `helper-illcond.R`).
 - **Keep the CRAN suite under 15 s.** It ran in 6.6 s on 2026-10-13
   (macOS ARM64, CRAN settings).
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads the
