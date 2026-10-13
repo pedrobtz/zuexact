@@ -24,4 +24,5 @@ void attribute_visible R_init_zuexact(DllInfo *dll) {
   R_registerRoutines(dll, NULL, call_methods, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
+  zxe_register_api();
 }

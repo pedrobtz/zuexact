@@ -1,0 +1,3 @@
+useDynLib(zuexacttest, .registration = TRUE)
+importFrom(zuexact, xsum)
+export(ct_info, ct_sum, ct_dot, ct_diff, ct_mean, ct_round_acc, ct_sum_parts)
