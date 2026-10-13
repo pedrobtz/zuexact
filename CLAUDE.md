@@ -23,14 +23,18 @@ design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 to 2.
-[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) and
-[`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md)
-are exported;
-[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md) follows
-design §6 on every platform. xsum is vendored, patched, and checked by
-upstream’s own checker and fuzzer. Means, dot products, accumulators,
-matrices and the C table are not built yet (Stages 3 to 6).
+Verified 2026-10-13: Stages 0 to 3. Exported:
+[`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md),
+[`xsum_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_mean.md),
+[`xsum_weighted_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_weighted_mean.md),
+[`xsum_cumsum()`](https://pedrobtz.github.io/zuexact/reference/xsum_cumsum.md),
+[`xsum_dot()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
+[`xsum_sqnorm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
+[`xsum_norm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
+[`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md).
+xsum is vendored, patched, and checked by upstream’s own checker and
+fuzzer. Accumulator values, matrices, grouped sums and the C table are
+not built yet (Stages 4 to 6).
 
 ## Stage tracking
 
@@ -91,9 +95,12 @@ vendoring changes and need `curl` and a C compiler.
   materialise it.
 
 - **One rounding.** Every function rounds the exact value once, except
-  where its documentation states the count (`xsum_norm()` two,
-  `xsum_weighted_mean()` three). Never add an intermediate `double`
-  between accumulation and the final round.
+  where its documentation states the count
+  ([`xsum_norm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md)
+  two,
+  [`xsum_weighted_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_weighted_mean.md)
+  three). Never add an intermediate `double` between accumulation and
+  the final round.
 
 - **`zuexact.so` exports `R_init_zuexact` only** (`$(C_VISIBILITY)` in
   `src/Makevars` and `src/Makevars.win`), and links no stdio, `abort`,
@@ -120,7 +127,10 @@ vendoring changes and need `curl` and a C compiler.
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads
   the shared object’s exported and undefined symbols with `nm`;
   `helper-vendor.R` defines `selftest()`, which sums through both xsum
-  accumulators directly.
+  accumulators directly; `helper-oracle.R` holds the exact rational
+  oracle (`exact_sum()`, `exact_dot()`), whose `round_bigq()` exists
+  because gmp’s [`as.double()`](https://rdrr.io/r/base/double.html)
+  truncates instead of rounding.
 
 ## Definition of done
 

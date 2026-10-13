@@ -39,6 +39,9 @@
 <li><p>Vendors Radford Neal’s ‘xsum’ (stable version 3), patched so that no standard I/O reaches the compiled code; upstream’s checker and fuzzer run against the vendored copy in CI.</p></li>
 <li><p><code><a href="../reference/xsum.html">xsum()</a></code> returns the exactly rounded sum of double, integer, logical and complex vectors, with <code>na.rm</code>, applying the same special-value rules on every platform. ALTREP vectors are read in blocks, never materialised.</p></li>
 <li><p><code><a href="../reference/zuexact_info.html">zuexact_info()</a></code> reports the vendored ‘xsum’ version, the accumulator threshold, SIMD and FMA support, and whether R has long doubles.</p></li>
+<li><p><code><a href="../reference/xsum_mean.html">xsum_mean()</a></code> divides the exact sum by the count with one rounding; <code><a href="../reference/xsum_weighted_mean.html">xsum_weighted_mean()</a></code> divides two exact sums.</p></li>
+<li><p><code><a href="../reference/xsum_dot.html">xsum_dot()</a></code>, <code><a href="../reference/xsum_dot.html">xsum_sqnorm()</a></code> and <code><a href="../reference/xsum_dot.html">xsum_norm()</a></code> include each product’s rounding error (TwoProduct with <code>fma()</code>), so dot products are exactly rounded too.</p></li>
+<li><p><code><a href="../reference/xsum_cumsum.html">xsum_cumsum()</a></code> rounds every prefix sum exactly.</p></li>
 </ul></div>
   </main></div>
 
