@@ -65,9 +65,13 @@ bits_results <- function() {
   add("xsum_rowsums/1500x2", xsum_rowsums(m))
   add("xsum_colsums/1500x2", xsum_colsums(m))
   add("xsum_by/1500x2", xsum_by(m, rep(1:30, 50)))
+  # 1e16 and 1e20 are exact powers of ten in binary64, parsed the same
+  # everywhere. 1e308 is not: R's decimal parser gives a different double on
+  # builds without long doubles, so it is built from its bit pattern.
+  e308 <- from_hex("7fe1ccf385ebc8a0")
   add("xsum/hard", c(
     xsum(c(1e16, 1, -1e16)), xsum(c(1e20, 1, -1e20)),
-    xsum(c(1e308, 1e308, -1e308)), xsum(rep(2^-1074, 3))
+    xsum(c(e308, e308, -e308)), xsum(rep(2^-1074, 3))
   ))
   for (i in seq_along(cases <- read_sumprecise())) {
     add(paste0("sumprecise/", i), xsum(cases[[i]]$inputs))

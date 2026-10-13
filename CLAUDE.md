@@ -96,6 +96,11 @@ vendoring changes and need `curl` and a C compiler.
 - **`tests/testthat/fixtures/bits.txt` is the cross-platform contract.** A
   changed line is a portability bug, never a reason to rerun
   `tools/write-bits`; that tool is for adding cases.
+- **Cross-platform inputs never come from decimal literals that are not
+  exact.** R's own parser differs between builds: on macOS ARM64 (no long
+  double) `1e308` reads as `0x1.1ccf385ebc8a3p+1023`, three ulps from the
+  correctly rounded `…8a0` that Linux gives. That broke the bits test once
+  (2026-10-13). Build such inputs from bit patterns (`from_hex()`).
 - **`ALTREP()` decides how a vector is read.** ALTREP vectors go through
   `*_GET_REGION` into a stack block; `REAL_RO()` on one would materialise it.
 
