@@ -1,0 +1,55 @@
+#!/bin/sh
+# Run upstream's correctness checker (xsum-check) and fuzzer against the
+# vendored, patched xsum in src/vendor/xsum, compiled without DEBUG exactly as
+# the package compiles it.
+#
+#   tools/xsum-check/run [fuzz-iterations [fuzz-seed]]
+#
+# The test programs are fetched from upstream at the commit pinned in
+# tools/vendor/manifest.tsv; they are not vendored, so they never reach the
+# package tarball. Exit status is non-zero if either program reports a
+# failure. CC and CFLAGS are honoured (default: cc, -O2).
+set -eu
+
+ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+. "$ROOT/tools/vendor/common.sh"
+row=$(manifest_rows | awk -F'\t' '$1 == "xsum"')
+repo=$(field "$row" 2)
+commit=$(field "$row" 4)
+iters=${1:-1000000}
+seed=${2:-$(date +%s)}
+CC=${CC:-cc}
+CFLAGS=${CFLAGS:--O2}
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+for f in xsum-check.c pbinary.c pbinary.h fuzz.c double-utils.c double-utils.h \
+         shewchuk.c shewchuk.h addition-with-bigints.c addition-with-bigints.h; do
+    curl -fsSL "https://raw.githubusercontent.com/$repo/$commit/$f" -o "$tmp/$f"
+done
+cp "$ROOT/src/vendor/xsum/xsum.c" "$ROOT/src/vendor/xsum/xsum.h" "$tmp/"
+cp "$ROOT/tools/xsum-check/shim.h" "$ROOT/tools/xsum-check/shim.c" "$tmp/"
+
+cd "$tmp"
+# shellcheck disable=SC2086
+sed 's/^#include "xsum.h"$/#include "xsum.h"\n#include "shim.h"/' xsum-check.c > check.c
+grep -q '^#include "shim.h"$' check.c
+# shellcheck disable=SC2086
+$CC $CFLAGS -std=gnu99 -o xsum-check -DPBINARY check.c pbinary.c shim.c xsum.c -lm
+# shellcheck disable=SC2086
+$CC $CFLAGS -std=gnu99 -o fuzz \
+    fuzz.c double-utils.c shewchuk.c addition-with-bigints.c xsum.c -lm
+
+echo "== xsum-check (upstream $commit)"
+./xsum-check > check.out 2>&1 || { cat check.out; echo "FAIL xsum-check exited non-zero" >&2; exit 1; }
+cat check.out
+# xsum-check exits 0 even when a result is wrong; it prints one of these
+# three messages instead (xsum-check.c, small_result() and friends).
+if grep -Eq 'Result incorrect|Different second time|not working' check.out; then
+    echo "FAIL xsum-check reported incorrect results" >&2
+    exit 1
+fi
+
+echo "== fuzz $iters iterations, seed $seed"
+./fuzz "$iters" "$seed"
+echo "xsum checks passed"

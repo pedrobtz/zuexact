@@ -1,0 +1,6 @@
+#!/bin/sh
+# Re-record checksums.sha256 from the vendor tree as it is. Use only after
+# tools/vendor/fetch; a hand edit to src/vendor/ belongs in a patch.
+. "$(dirname "$0")/common.sh"
+record_checksums
+echo "recorded $CHECKSUMS"

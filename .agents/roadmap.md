@@ -120,6 +120,18 @@ measured and written down. No R function yet.
   through small and large accumulators so a testthat file exercises the
   vendored code before Stage 2 exists.
 
+**Deviation, 2026-10-13.** File layout follows the r-actions `vendor.yml`
+defaults and the family's package template rather than the paths written
+above: `src/vendor/xsum/` (not `src/xsum/`); `tools/vendor/manifest.tsv` and
+`tools/vendor/checksums.sha256` (not `src/xsum/VERSION`);
+`tools/patches/xsum/0001-no-stdio-exact-only.patch` (not `src/xsum/PATCH`);
+`tools/vendor/{fetch,verify}` (not `tools/vendor-xsum`);
+`tools/xsum-check/run` (not `tools/check-xsum`). The non-exact routines are
+removed by the patch and not kept under `tools/bench/`: the benchmark needs
+only the exact routines. The full r-actions native-checks set (sanitizers,
+valgrind, LTO, gctorture, rchk, analyzers, CRAN special checks) is adopted
+instead of the sanitizers workflow alone. Scope is unchanged.
+
 **Exit criteria.**
 - `R CMD check` passes on every full-profile leg; the shared object
   contains no `printf`, `puts`, `fprintf` or other stdio symbol (audited

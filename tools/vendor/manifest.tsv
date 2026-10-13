@@ -1,0 +1,2 @@
+source	repo	tag	commit	version_string	archive	archive_sha256	license	defines	patches
+xsum	radfordneal/xsum	stable-version-3	b766b3e104cdbd6769c8df033fb430700fce32dd	stable-version-3	xsum.c:xsum.c,xsum.h:xsum.h,LICENSE:LICENSE	1ac8e6002f613fde38e44cfd109385d6966df499b2c3e56dcd10fcfd2f9b7114,61b09fc61f03a4095b295369dc391016ad1ef1a865f5c1c1409cdbf6b537e70c,76d651572de3533387012b53639da2fa57f5990212b7abd66a4eec82c75caaf0	MIT		0001-no-stdio-exact-only.patch

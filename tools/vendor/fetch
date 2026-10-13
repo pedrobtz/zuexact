@@ -1,0 +1,17 @@
+#!/bin/sh
+# Rebuild src/vendor/ from upstream at the commits pinned in manifest.tsv,
+# apply tools/patches/<source>/*, and record checksums.sha256.
+#
+# To update xsum: edit the commit and archive_sha256 columns of manifest.tsv
+# (the hashes of the new upstream files), rebase the patches if they no longer
+# apply, then run this script and tools/vendor/verify.
+. "$(dirname "$0")/common.sh"
+
+manifest_rows | while IFS= read -r row; do
+    src=$(field "$row" 1)
+    rm -rf "${VENDOR:?}/$src"
+    fetch_row "$row" "$VENDOR/$src"
+    printf 'fetched %s at %s\n' "$src" "$(field "$row" 4)"
+done
+record_checksums
+echo "recorded $CHECKSUMS"
