@@ -23,8 +23,7 @@ integration (GitHub Actions, through pedrobtz/r-actions):
   oldrel-1).
 * R-hub containers with CRAN's compilers: clang 23, Ubuntu clang, Ubuntu
   GCC 16.
-* R built without long doubles (CRAN's NOLD flavour), and with only hard
-  dependencies installed (NOSUGGESTS).
+* R built without long doubles (CRAN's NOLD flavour).
 * UBSan and ASan (GCC and clang), valgrind, LTO, gctorture, rchk, and GCC's
   -fanalyzer.
 

@@ -64,7 +64,13 @@ summation (Kahan, Neumaier, pairwise), which is faster but not exact, see
 
 ## Installation
 
-You can install the development version of zuexact from
+Install the released version from CRAN with:
+
+``` r
+install.packages("zuexact")
+```
+
+or the development version from
 [GitHub](https://github.com/pedrobtz/zuexact) with:
 
 ``` r
