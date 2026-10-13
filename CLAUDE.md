@@ -23,7 +23,9 @@ design decides.
 
 ## Current state
 
-Verified 2026-10-13: Stages 0 to 4. Exported:
+Verified 2026-10-13: every roadmap stage is implemented and the package
+is at version 0.1.0, ready for the CRAN-submission issue (#12).
+Exported:
 [`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md),
 [`xsum_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_mean.md),
 [`xsum_weighted_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_weighted_mean.md),
@@ -44,10 +46,10 @@ the accumulator values
 and
 [`zuexact_info()`](https://pedrobtz.github.io/zuexact/reference/zuexact_info.md),
 plus the registered C table `zuexact_api_v1` (`inst/include/zuexact.h`).
-xsum is vendored, patched, and checked by upstream’s own checker and
-fuzzer. Left: release readiness (Stage 8). Stage 7 added the oracle,
-ill-conditioned, test262 and cross-platform bits suites, the libFuzzer
-harness and the benchmarks.
+Results are proven against exact rationals,
+[`PreciseSums::fsum()`](https://rdrr.io/pkg/PreciseSums/man/fsum.html),
+the test262 vectors and ill-conditioned inputs, and must be
+bit-identical on every CI leg.
 
 ## Stage tracking
 
@@ -182,8 +184,9 @@ vendoring changes and need `curl` and a C compiler.
   [`PreciseSums::fsum()`](https://rdrr.io/pkg/PreciseSums/man/fsum.html),
   the `Math.sumPrecise` test262 vectors (`fixtures/sumprecise/`, as bit
   patterns), and the Ogita–Rump–Oishi ill-conditioned generators
-  (`helper-illcond.R`). `ZUEXACT_SLOW_TESTS=true` widens every sweep
-  (family rule R7).
+  (`helper-illcond.R`). `ZUEXACT_SLOW_TESTS=true` widens every sweep and
+  `ZUEXACT_SKIP_HEAVY=true` (set by the gctorture leg) shrinks it to two
+  inputs (family rule R7, `sweep_reps()` in `helper-illcond.R`).
 - **Keep the CRAN suite under 15 s.** It ran in 6.6 s on 2026-10-13
   (macOS ARM64, CRAN settings).
 - **Helpers** live in `tests/testthat/helper-*.R`: `helper-abi.R` reads

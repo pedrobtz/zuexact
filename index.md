@@ -53,15 +53,41 @@ read in pieces: `acc <- xsum_add(acc, chunk)` for each one, then
 `xsum_value(acc)`. `xsum_merge(a, xsum_negate(b))` is the exact
 difference of two sums.
 
-**Status:** under development, towards the first CRAN release. The
-design is in
-[`.agents/design.md`](https://pedrobtz.github.io/zuexact/.agents/design.md)
-and the plan to the first CRAN release in
-[`.agents/roadmap.md`](https://pedrobtz.github.io/zuexact/.agents/roadmap.md).
+## What else is in the package
+
+- [`xsum_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_mean.md),
+  [`xsum_weighted_mean()`](https://pedrobtz.github.io/zuexact/reference/xsum_weighted_mean.md):
+  exact means.
+- [`xsum_dot()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
+  [`xsum_sqnorm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md),
+  [`xsum_norm()`](https://pedrobtz.github.io/zuexact/reference/xsum_dot.md):
+  dot products and norms with each product’s rounding error included.
+- [`xsum_cumsum()`](https://pedrobtz.github.io/zuexact/reference/xsum_cumsum.md),
+  [`xsum_rowsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md),
+  [`xsum_colsums()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md),
+  [`xsum_by()`](https://pedrobtz.github.io/zuexact/reference/xsum_rowsums.md):
+  exact versions of [`cumsum()`](https://rdrr.io/r/base/cumsum.html),
+  [`rowSums()`](https://rdrr.io/r/base/colSums.html),
+  [`colSums()`](https://rdrr.io/r/base/colSums.html) and
+  [`rowsum()`](https://rdrr.io/r/base/rowsum.html).
+- A registered C interface, `<zuexact.h>`, for other packages’ compiled
+  code.
+
+[`vignette("exact-summation")`](https://pedrobtz.github.io/zuexact/articles/exact-summation.md)
+explains the details. For compensated summation (Kahan, Neumaier,
+pairwise), which is faster but not exact, see
+[PreciseSums](https://CRAN.R-project.org/package=PreciseSums).
 
 ## Installation
 
-You can install the development version of zuexact from
+Install the released version from CRAN with:
+
+``` r
+
+install.packages("zuexact")
+```
+
+or the development version from
 [GitHub](https://github.com/pedrobtz/zuexact) with:
 
 ``` r

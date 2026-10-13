@@ -1,16 +1,17 @@
 # Changelog
 
-## zuexact 0.0.0.9000
+## zuexact 0.1.0
 
-Development version of the first release, 0.1.0. This heading becomes
-`# zuexact 0.1.0` in the last roadmap stage.
-
-- Package identity: real `DESCRIPTION`, licence and copyright files,
-  hidden symbols, and CI on the R build without long doubles.
+First release.
 
 - Vendors Radford Neal’s ‘xsum’ (stable version 3), patched so that no
   standard I/O reaches the compiled code; upstream’s checker and fuzzer
   run against the vendored copy in CI.
+
+- A vignette,
+  [`vignette("exact-summation")`](https://pedrobtz.github.io/zuexact/articles/exact-summation.md),
+  explains why base [`sum()`](https://rdrr.io/r/base/sum.html) differs
+  between platforms and how to sum in pieces and from C.
 
 - [`xsum()`](https://pedrobtz.github.io/zuexact/reference/xsum.md)
   returns the exactly rounded sum of double, integer, logical and
