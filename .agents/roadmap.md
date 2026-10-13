@@ -31,7 +31,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | [#17](https://github.com/pedrobtz/zuexact/pull/17) | 2026-10-13 |
 | 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | [#18](https://github.com/pedrobtz/zuexact/pull/18) | 2026-10-13 |
 | 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | [#19](https://github.com/pedrobtz/zuexact/pull/19) | 2026-10-13 |
-| 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | | 2026-10-13 |
+| 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | [#20](https://github.com/pedrobtz/zuexact/pull/20) | 2026-10-13 |
 | 8 | [v0.1.0 readiness](#stage-8--v010-readiness) | [#11](https://github.com/pedrobtz/zuexact/issues/11) | | |
 
 ## Stage 0 — Package identity
