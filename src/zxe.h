@@ -27,5 +27,10 @@ SEXP zxe_info(void);
 SEXP zxe_mean(SEXP args, SEXP narm);
 SEXP zxe_dot(SEXP x, SEXP y);
 SEXP zxe_cumsum(SEXP x);
+SEXP zxe_acc_new(void);
+SEXP zxe_acc_add(SEXP acc, SEXP x, SEXP narm);
+SEXP zxe_acc_merge(SEXP acc, SEXP other);
+SEXP zxe_acc_negate(SEXP acc);
+SEXP zxe_acc_value(SEXP acc, SEXP n);
 
 #endif

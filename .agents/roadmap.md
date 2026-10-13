@@ -28,7 +28,7 @@ before the C table (Stage 6) because the table operates on the same bytes.
 | 1 | [Vendor, patch and measure xsum](#stage-1--vendor-patch-and-measure-xsum) | [#4](https://github.com/pedrobtz/zuexact/issues/4) | [#14](https://github.com/pedrobtz/zuexact/pull/14) | 2026-10-13 |
 | 2 | [Exact sums and special values](#stage-2--exact-sums-and-special-values) | [#5](https://github.com/pedrobtz/zuexact/issues/5) | [#15](https://github.com/pedrobtz/zuexact/pull/15) | 2026-10-13 |
 | 3 | [Means, cumulative sums, dot products and norms](#stage-3--means-cumulative-sums-dot-products-and-norms) | [#6](https://github.com/pedrobtz/zuexact/issues/6) | [#16](https://github.com/pedrobtz/zuexact/pull/16) | 2026-10-13 |
-| 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | | |
+| 4 | [Accumulator values](#stage-4--accumulator-values) | [#7](https://github.com/pedrobtz/zuexact/issues/7) | [#17](https://github.com/pedrobtz/zuexact/pull/17) | 2026-10-13 |
 | 5 | [Matrices and grouped sums](#stage-5--matrices-and-grouped-sums) | [#8](https://github.com/pedrobtz/zuexact/issues/8) | | |
 | 6 | [The C table](#stage-6--the-c-table) | [#9](https://github.com/pedrobtz/zuexact/issues/9) | | |
 | 7 | [Oracles, adversarial inputs and cross-platform identity](#stage-7--oracles-adversarial-inputs-and-cross-platform-identity) | [#10](https://github.com/pedrobtz/zuexact/issues/10) | | |
@@ -272,6 +272,12 @@ a `parallel` worker merges correctly on the caller.
   the right class.
 - A vignette section (or README section) showing the streaming pattern
   over chunks and over workers.
+
+**Deviation, 2026-10-13.** The header's fourth to eighth bytes also carry
+flags for `NA`, `NaN`, `Inf` and `-Inf` seen, because xsum keeps one NaN by
+payload and cannot tell R's `NA` from `NaN`. `xsum_acc()` also takes
+`na.rm`. The streaming pattern is shown in the README; the vignette comes
+with Stage 8.
 
 **Exit criteria.**
 - The worker round-trip test passes on Linux, macOS and Windows legs.

@@ -25,3 +25,7 @@ Development version of the first release, 0.1.0. This heading becomes
   rounded too.
 
 * `xsum_cumsum()` rounds every prefix sum exactly.
+
+* Accumulators as R values: `xsum_acc()`, `xsum_add()`, `xsum_merge()`,
+  `xsum_negate()`, `xsum_value()` and `xsum_mean_value()` build exact sums
+  in pieces, in any order, and across processes (they serialise).
