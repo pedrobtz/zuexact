@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/pedrobtz/zuexact/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/pedrobtz/zuexact/blob/0.1.0/DESCRIPTION)
 
 Baltazar P (2026). *zuexact: Exactly Rounded Sums, Means and Dot
 Products*. R package version 0.1.0,
