@@ -1,11 +1,12 @@
 # Design §11: coverage-guided fuzzing of the vendored xsum as zuexact uses
 # it (tools/fuzz/fuzz_xsum.c checks the accumulator invariants), compiled
 # without R, under ASan and UBSan. Short runs on pull requests, a long one
-# nightly; the corpus cache joins them into one campaign.
+# weekly, since the vendored code rarely changes; the corpus cache joins
+# them into one campaign.
 on:
   pull_request:
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 3 * * 0"
 
 name: fuzz
 
