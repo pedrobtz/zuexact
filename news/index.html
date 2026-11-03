@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">zuexact</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,11 +30,14 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/pedrobtz/zuexact/blob/0.1.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/pedrobtz/zuexact/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0" id="zuexact-010">zuexact 0.1.0<a class="anchor" aria-label="anchor" href="#zuexact-010"></a></h2>
+<h2 class="pkg-version" data-toc-text="development version" id="zuexact-development-version">zuexact (development version)<a class="anchor" aria-label="anchor" href="#zuexact-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.0" id="zuexact-010">zuexact 0.1.0<a class="anchor" aria-label="anchor" href="#zuexact-010"></a></h2><p class="text-muted">CRAN release: 2026-10-22</p>
 <p>First release.</p>
 <ul><li><p>Vendors Radford Neal’s ‘xsum’ (stable version 3), patched so that no standard I/O reaches the compiled code; upstream’s checker and fuzzer run against the vendored copy in CI.</p></li>
 <li><p>A vignette, <code><a href="../articles/exact-summation.html">vignette("exact-summation")</a></code>, explains why base <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum()</a></code> differs between platforms and how to sum in pieces and from C.</p></li>
@@ -48,7 +51,8 @@
 <li><p>A registered C interface, <code>zuexact_api_v1</code> in <code>inst/include/zuexact.h</code>, gives other packages’ C code the same exact accumulators, sums, dot products, merges and means, through <code>LinkingTo: zuexact</code>.</p></li>
 <li><p>Every result is tested against exact rational arithmetic (‘gmp’), <code><a href="https://rdrr.io/pkg/PreciseSums/man/fsum.html" class="external-link">PreciseSums::fsum()</a></code>, the test262 <code>Math.sumPrecise</code> vectors and ill-conditioned inputs up to condition number 1e40, and must be bit-identical on every CI platform.</p></li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
