@@ -10,3 +10,7 @@
 ^src/.*\.(so|dll)$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+^\.superpowers$
+^\.worktrees$
+^\.claude$
+^AGENTS\.md$
