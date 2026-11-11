@@ -2,8 +2,8 @@
 # vendored, patched xsum on the three CI platforms, and the small/large
 # threshold benchmark (tools/run-benchmarks) is written to the job summary.
 on:
-  push:
-    branches: [main, master]
+  # No `push:`: a pull request already checks its merge with main,
+  # and the schedule checks main (r-actions README, "Pushes to main").
   pull_request:
 
 name: xsum-check
