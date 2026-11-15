@@ -5,16 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Shared conventions
 
-The portfolio's shared rules are synced into `.claude/shared/` from
-`pedrobtz/packages:claude/shared/`. Never edit them here. Where this file and
-a shared file disagree, this file wins for this package.
+<!-- r-skills: shared-rules -->
 
-@.claude/shared/workflow.md
-@.claude/shared/r-package.md
-@.claude/shared/ci.md
-@.claude/shared/native-code.md
-@.claude/shared/correctness.md
-@.claude/shared/assurance.md
+The portfolio's shared rules (`workflow`, `r-package`, `ci`, `native-code`,
+`correctness`, `assurance`) come from the
+[r-skills](https://github.com/pedrobtz/r-skills) plugin's `rules/`, loaded at
+session start because of the marker above. Never copy them here. Where this
+file and a shared rule disagree, this file wins for this package. Cloud
+sessions do not load the plugin and run without them.
 
 ## What this is
 
@@ -57,7 +55,7 @@ requests and allows only the merge method; squash is refused.
 ## Commands
 
 Run from the package root. The everyday `devtools` loop is in
-`.claude/shared/r-package.md`; these are the package's own.
+the shared `r-package.md` rules; these are the package's own.
 
 ```sh
 tools/vendor/verify                  # vendored tree == upstream + patches
@@ -123,7 +121,7 @@ compiler.
   table and header use `zuexact_`.
 - **Condition classes** are named `zuexact_<kind>`, for example
   `zuexact_invalid_argument`, not the `<pkg>_<kind>_error` pattern of
-  `.claude/shared/r-package.md`. Tests assert on these classes.
+  the shared `r-package.md` rules. Tests assert on these classes.
 - **Prose is en-GB**, in roxygen and Markdown alike.
 
 ## Testing
@@ -160,7 +158,7 @@ benchmark on three OSes, outside R), `consumer.yaml` (the C table from
 two minutes on pull requests, 30 minutes weekly on Sundays). `pkgdown.yaml`
 deploys with `force: false` so it does not overwrite the badge commit.
 
-**Deviation from `.claude/shared/ci.md`:** `R-CMD-check.yaml` and
+**Deviation from the shared `ci.md` rules:** `R-CMD-check.yaml` and
 `native-checks.yaml` choose the profile themselves rather than passing
 `profile: auto`. They run quick on pull requests and **full on every push to
 `main`**, so a merge does start the full set here. The `full-ci` label runs
