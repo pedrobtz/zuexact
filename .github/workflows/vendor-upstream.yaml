@@ -14,7 +14,7 @@ permissions:
 jobs:
   upstream:
     # Holds a write token (issues), so pinned to a commit.
-    uses: pedrobtz/r-actions/.github/workflows/vendor-upstream.yml@17264ce002a9359a492e0183852a555a5bb866e7 # v1.23.0
+    uses: pedrobtz/r-actions/.github/workflows/vendor-upstream.yml@v1
     permissions:
       contents: read
       issues: write
