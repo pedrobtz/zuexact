@@ -47,10 +47,10 @@ zuexact_info()
 #> [1] 128
 #> 
 #> $simd
-#> [1] "sse2"
+#> [1] "avx"
 #> 
 #> $fma_hardware
-#> [1] FALSE
+#> [1] TRUE
 #> 
 #> $long_double
 #> [1] TRUE
